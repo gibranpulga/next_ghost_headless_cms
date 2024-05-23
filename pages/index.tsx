@@ -59,6 +59,7 @@ const Home = ({ cmsData }: { cmsData: CmsData }) => {
   return (
       <main className="bg-gray-100 min-h-screen flex flex-col md:flex-row">
         <div className="flex-grow">
+          <FeaturedSection featuredPost={featuredPost} sidePosts={sidePosts} />
           <PostsList posts={remainingPosts} />
         </div>
       </main>

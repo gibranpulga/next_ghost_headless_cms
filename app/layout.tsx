@@ -1,3 +1,4 @@
+import "./globals.css";
 import BlogLayout from './BlogLayout';
 import type { SettingsResponse } from "@tryghost/content-api";
 
