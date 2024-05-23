@@ -136,6 +136,8 @@ export async function getSearchPosts() {
 
 // Navigation
 export async function getNavigation() {
+  console.log('navigation')
+
   return await api.settings.browse()
     .catch((error: Error) => {
       console.log(error)

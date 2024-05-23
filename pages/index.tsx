@@ -5,52 +5,49 @@ import PostsList from '../app/PostsList';
 import { GetStaticProps } from 'next';
 import type { PostsOrPages, SettingsResponse } from '@tryghost/content-api';
 import { getPosts, getNavigation } from '../app/ghost-client';
-
+import BlogLayout from '@/app/BlogLayout';
+import RootLayout from '@/app/layout';
 
 interface CmsData {
-  posts: PostsOrPages
-  settings: SettingsResponse
-  previewPosts?: PostsOrPages
-  prevPost?: PostsOrPages
-  nextPost?: PostsOrPages
-  bodyClass: string
-}
-
-interface IndexProps {
-  cmsData: CmsData
+  posts: PostsOrPages;
+  settings: SettingsResponse;
+  previewPosts?: PostsOrPages;
+  prevPost?: PostsOrPages;
+  nextPost?: PostsOrPages;
+  bodyClass: string;
 }
 
 export const getStaticProps: GetStaticProps = async () => {
-  let settings
-  let posts: PostsOrPages | []
+  let settings;
+  let posts: PostsOrPages | [];
 
-  console.time('Index - getStaticProps')
+  console.time('Index - getStaticProps');
 
   try {
-    posts = await getPosts()
-    settings = await getNavigation()
+    posts = await getPosts();
+    settings = await getNavigation();
+    console.log('settings getStaticProps', settings);
+
   } catch (error) {
-    throw new Error('Index creation failed.')
+    throw new Error('Index creation failed.');
   }
 
   const cmsData = {
     settings,
-    posts
-  }
+    posts,
+  };
 
-
-  console.timeEnd('Index - getStaticProps')
+  console.timeEnd('Index - getStaticProps');
 
   return {
     props: {
       cmsData,
-    }
-  }
+    },
+  };
 };
 
-
 const Home = ({ cmsData }: { cmsData: CmsData }) => {
-  const { settings, posts } = cmsData
+  const { posts } = cmsData;
 
   // Assuming the first post is the featured post
   const featuredPost = posts[0];
@@ -60,13 +57,21 @@ const Home = ({ cmsData }: { cmsData: CmsData }) => {
   const remainingPosts = posts.slice(3);
 
   return (
-    <main className="bg-gray-100 min-h-screen flex flex-col md:flex-row">
-      <div className="flex-grow">
-        <FeaturedSection featuredPost={featuredPost} sidePosts={sidePosts} />
-        <PostsList posts={remainingPosts} />
-      </div>
-    </main>
+      <main className="bg-gray-100 min-h-screen flex flex-col md:flex-row">
+        <div className="flex-grow">
+          <PostsList posts={remainingPosts} />
+        </div>
+      </main>
   );
 };
 
-export default Home;
+export default function Page({ cmsData }: { cmsData: CmsData }) {
+  const { settings } = cmsData;
+  console.log('settings 2', settings)
+  
+  return (
+    <RootLayout settings={settings}>
+      <Home cmsData={cmsData} />
+    </RootLayout>
+  );
+}

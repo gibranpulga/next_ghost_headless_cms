@@ -1,10 +1,10 @@
 "use client";
-import Footer from "../app/Footer";
-import Header from "../app/Header";
+import Footer from "./Footer";
+import Header from "./Header";
 import { ThemeProvider } from 'next-themes';
-import type { Settings } from "@tryghost/content-api";
+import type { SettingsResponse } from "@tryghost/content-api";
 
-function BlogLayout({ setting, children }: { setting: Settings, children: React.ReactNode }) {
+function BlogLayout({ setting, children }: { setting: SettingsResponse, children: React.ReactNode }) {
   console.log('blog layout', setting)
 
   return (
@@ -16,4 +16,4 @@ function BlogLayout({ setting, children }: { setting: Settings, children: React.
   );
 }
 
-export default BlogLayout;
+export default BlogLayout
