@@ -67,7 +67,7 @@ const Read = ({ post, settings }: ReadProps) => {
           <article className="mx-auto w-full max-w-3xl prose prose-xl prose-p:text-gray-800 dark:prose-p:text-gray-100 sm:prose-base prose-a:no-underline prose-blue dark:prose-invert">
             <div className="flex mb-4 w-full justify-between">
               <Link className="inline-flex items-center" href={`/`}>
-                <FaAngleLeft /> Back
+                <FaAngleLeft /> Voltar
               </Link>
 
               {post.primary_tag ? (
@@ -83,49 +83,19 @@ const Read = ({ post, settings }: ReadProps) => {
               {post.title}
             </h1>
 
-            <header className="mb-4 lg:mb-6 not-format">
-              <address className="flex items-center mb-6 not-italic">
-                <div className="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white">
-                  <Image
-                    width={32}
-                    height={32}
-                    className="mr-4 w-10 h-10 rounded-full"
-                    src={post.primary_author.profile_image}
-                    alt={post.primary_author.name}
-                  />
-                  {post.primary_author ? (
-                    <Link
-                      href={`/authors/${post.primary_author.slug}`}
-                      rel="author"
-                      className="text-xl font-bold text-gray-800 dark:text-white"
-                    >
-                      {post.primary_author.name}
-                    </Link>
-                  ) : (
-                    " "
-                  )}
-
-                  {post.published_at ? (
-                    <time
-                      className="text-base font-light text-gray-800 dark:text-white mx-1"
-                      dateTime={post.published_at}
-                      title={format(new Date(post.published_at), "dd-MM-yyyy")}
-                    >
-                      {format(new Date(post.published_at), "dd-MM-yyyy")}
-                    </time>
-                  ) : (
-                    ""
-                  )}
-
-                  <div className="text-base w-1 h-1 rounded-full bg-black dark:bg-white mx-1"></div>
-
-                  <p className="text-base font-light text-gray-500 dark:text-gray-400">
-                    {post.reading_time} Min de Leitura
-                  </p>
-                </div>
-              </address>
-            </header>
-
+            <section className="mb-6">
+              <p className="text-lg text-gray-700 dark:text-gray-300 italic">{post.excerpt}</p>
+              <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-2">
+                <Link href={`/authors/${post.primary_author.slug}`} className="font-semibold text-gray-900 dark:text-white mr-2">
+                  Por: {post.primary_author.name} 
+                </Link>
+                <time className="mr-2" dateTime={post.published_at}>
+                em {format(new Date(post.published_at), "dd/MM/yyyy 'as' HH:mm")}
+                </time>
+                <span>•</span>
+                <span className="ml-2">{post.reading_time} minutos de leitura</span>
+              </div>
+            </section>
             <figure>
               <Image
                 className="mx-auto"

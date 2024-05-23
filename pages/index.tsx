@@ -1,5 +1,3 @@
-import Image from 'next/image';
-import Card from '../app/Card'; // Adjust the import paths as necessary
 import FeaturedSection from '../app/FeaturedSection';
 import PostsList from '../app/PostsList';
 import { GetStaticProps } from 'next';
@@ -7,7 +5,9 @@ import type { PostsOrPages, SettingsResponse, PostOrPage } from '@tryghost/conte
 import { getPosts, getNavigation, getTagPosts } from '../app/ghost-client';
 import RootLayout from '@/app/layout';
 import PopularPosts from '../app/PopularPosts'; // Import the new component
-import FinancialWidget from '@/app/FinancialWidget';
+import CustomFinancialWidget from '@/app/TradingViewWidget';
+import HoroscopeWidget from '@/app/HoroscopeWidget';
+
 
 interface CmsData {
   posts: PostsOrPages;
@@ -79,7 +79,8 @@ const Home = ({ cmsData }: { cmsData: CmsData }) => {
           </div>
           <aside className="md:w-1/4 md:pl-4">
             <PopularPosts posts={popularPosts} />
-            <FinancialWidget /> {/* Add FinancialWidget here */}
+            <CustomFinancialWidget /> 
+            <HoroscopeWidget/>
           </aside>
         </div>
       </div>
