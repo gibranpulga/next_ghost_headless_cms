@@ -3,7 +3,6 @@ import Image from "next/image";
 import type { Settings } from "@tryghost/content-api";
 
 function Header({ setting }: { setting: Settings }) {
-  console.log('header', setting)
 
   return (
     <header className="px-2 sm:px-4 py-2.5 dark:bg-gray-900 w-full">

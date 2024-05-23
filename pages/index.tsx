@@ -5,9 +5,9 @@ import PostsList from '../app/PostsList';
 import { GetStaticProps } from 'next';
 import type { PostsOrPages, SettingsResponse, PostOrPage } from '@tryghost/content-api';
 import { getPosts, getNavigation, getTagPosts } from '../app/ghost-client';
-import BlogLayout from '@/app/BlogLayout';
 import RootLayout from '@/app/layout';
 import PopularPosts from '../app/PopularPosts'; // Import the new component
+import FinancialWidget from '@/app/FinancialWidget';
 
 interface CmsData {
   posts: PostsOrPages;
@@ -30,7 +30,6 @@ export const getStaticProps: GetStaticProps = async () => {
     posts = await getPosts();
     settings = await getNavigation();
     popularPosts = await getTagPosts('mais-lidos'); // Fetch posts with the "mais-lidos" tag
-    console.log('settings getStaticProps', settings);
   } catch (error) {
     throw new Error('Index creation failed.');
   }
@@ -80,6 +79,7 @@ const Home = ({ cmsData }: { cmsData: CmsData }) => {
           </div>
           <aside className="md:w-1/4 md:pl-4">
             <PopularPosts posts={popularPosts} />
+            <FinancialWidget /> {/* Add FinancialWidget here */}
           </aside>
         </div>
       </div>
@@ -89,7 +89,6 @@ const Home = ({ cmsData }: { cmsData: CmsData }) => {
 
 export default function Page({ cmsData }: { cmsData: CmsData }) {
   const { settings } = cmsData;
-  console.log('settings 2', settings);
 
   return (
     <RootLayout settings={settings}>
