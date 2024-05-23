@@ -7,7 +7,6 @@ function Header({ setting }: { setting: Settings }) {
 
   return (
     <header className="px-2 sm:px-4 py-2.5 dark:bg-gray-900 w-full">
-
       <div className="container flex flex-wrap items-center justify-between mx-auto">
         {/* Logo for blog */}
         <Link href="/" className="flex items-center">
