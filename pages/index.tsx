@@ -3,38 +3,56 @@ import Card from '../app/Card'; // Adjust the import paths as necessary
 import FeaturedSection from '../app/FeaturedSection';
 import PostsList from '../app/PostsList';
 import { GetStaticProps } from 'next';
-import type { PostsOrPages, SettingsResponse } from '@tryghost/content-api';
-import { getPosts, getNavigation } from '../app/ghost-client';
+import type { PostsOrPages, SettingsResponse, PostOrPage } from '@tryghost/content-api';
+import { getPosts, getNavigation, getTagPosts } from '../app/ghost-client';
 import BlogLayout from '@/app/BlogLayout';
 import RootLayout from '@/app/layout';
+import PopularPosts from '../app/PopularPosts'; // Import the new component
 
 interface CmsData {
   posts: PostsOrPages;
   settings: SettingsResponse;
-  previewPosts?: PostsOrPages;
-  prevPost?: PostsOrPages;
-  nextPost?: PostsOrPages;
-  bodyClass: string;
+  popularPosts: PostsOrPages; // Add popularPosts to CmsData
+  featuredPost: PostOrPage | null; // Add featuredPost to CmsData
+  sidePosts: PostsOrPages; // Add sidePosts to CmsData
 }
 
 export const getStaticProps: GetStaticProps = async () => {
   let settings;
   let posts: PostsOrPages | [];
+  let popularPosts: PostsOrPages | [];
+  let featuredPost: PostOrPage | null = null;
+  let sidePosts: PostsOrPages | [] = [];
 
   console.time('Index - getStaticProps');
 
   try {
     posts = await getPosts();
     settings = await getNavigation();
+    popularPosts = await getTagPosts('mais-lidos'); // Fetch posts with the "mais-lidos" tag
     console.log('settings getStaticProps', settings);
-
   } catch (error) {
     throw new Error('Index creation failed.');
   }
 
+  // Find the most recent featured post
+  featuredPost = posts.find(post => post.featured) || null;
+
+  // Filter out "mais-lidos" and "side-post" posts from the main posts
+  const filteredPosts = posts.filter(post => !post.tags.some(tag => tag.slug === 'mais-lidos' || tag.slug === 'side-post'));
+
+  // Filter side posts and get the most recent 2
+  sidePosts = posts
+    .filter(post => post.tags.some(tag => tag.slug === 'side-post'))
+    .sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime())
+    .slice(0, 2);
+
   const cmsData = {
     settings,
-    posts,
+    posts: filteredPosts,
+    popularPosts, // Include popularPosts in cmsData
+    featuredPost, // Include featuredPost in cmsData
+    sidePosts, // Include sidePosts in cmsData
   };
 
   console.timeEnd('Index - getStaticProps');
@@ -47,29 +65,32 @@ export const getStaticProps: GetStaticProps = async () => {
 };
 
 const Home = ({ cmsData }: { cmsData: CmsData }) => {
-  const { posts } = cmsData;
+  const { posts, popularPosts, featuredPost, sidePosts } = cmsData;
 
-  // Assuming the first post is the featured post
-  const featuredPost = posts[0];
-  // Assuming the next two posts are for the side posts
-  const sidePosts = posts.slice(1, 3);
   // Remaining posts
-  const remainingPosts = posts.slice(3);
+  const remainingPosts = posts.slice();
 
   return (
-      <main className="bg-gray-100 min-h-screen flex flex-col md:flex-row">
-        <div className="flex-grow">
-          <FeaturedSection featuredPost={featuredPost} sidePosts={sidePosts} />
-          <PostsList posts={remainingPosts} />
+    <main className="bg-gray-100 min-h-screen flex flex-col">
+      <div className="container mx-auto max-w-7xl px-4">
+        <FeaturedSection featuredPost={featuredPost} sidePosts={sidePosts} />
+        <div className="flex flex-col md:flex-row mt-8">
+          <div className="flex-grow md:w-3/4 md:pr-4">
+            <PostsList posts={remainingPosts} />
+          </div>
+          <aside className="md:w-1/4 md:pl-4">
+            <PopularPosts posts={popularPosts} />
+          </aside>
         </div>
-      </main>
+      </div>
+    </main>
   );
 };
 
 export default function Page({ cmsData }: { cmsData: CmsData }) {
   const { settings } = cmsData;
-  console.log('settings 2', settings)
-  
+  console.log('settings 2', settings);
+
   return (
     <RootLayout settings={settings}>
       <Home cmsData={cmsData} />
