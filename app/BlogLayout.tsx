@@ -2,15 +2,17 @@
 import Footer from "./Footer";
 import Header from "./Header";
 import { ThemeProvider } from 'next-themes';
-import type { SettingsResponse } from "@tryghost/content-api";
+import type { PostsOrPages, SettingsResponse } from "@tryghost/content-api";
 
-function BlogLayout({ setting, children }: { setting: SettingsResponse, children: React.ReactNode }) {
+function BlogLayout({ setting, children, pages }: { setting: SettingsResponse, children: React.ReactNode, pages: PostsOrPages }) {
+  console.log("pages", pages);
+  console.log("setting", setting);
 
   return (
     <ThemeProvider attribute="class">
-      <Header setting={setting} />
+      <Header settings={setting} />
       {children}
-      <Footer setting={setting} />
+      <Footer settings={setting} pages={pages}/>
     </ThemeProvider>
   );
 }

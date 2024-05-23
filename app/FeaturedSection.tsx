@@ -11,7 +11,7 @@ function FeaturedSection({ featuredPost, sidePosts }: { featuredPost: PostOrPage
             {featuredPost.primary_tag.name}
           </div>
         )}
-        <Link href={`/read/${featuredPost.slug}`}>
+        <Link href={`/noticia/${featuredPost.slug}`}>
           <h2 className="text-3xl font-bold text-red-600">{featuredPost.title}</h2>
           <p className="mt-4 text-lg text-gray-700">{featuredPost.excerpt}</p>
         </Link>
@@ -22,7 +22,7 @@ function FeaturedSection({ featuredPost, sidePosts }: { featuredPost: PostOrPage
           const otherTag = post.tags.filter(tag => tag.slug !== 'side-post')[0];
 
           return (
-            <Link href={`/read/${post.slug}`} key={index}>
+            <Link href={`/noticia/${post.slug}`} key={index}>
               <div className="relative h-48 overflow-hidden rounded-lg shadow-lg">
                 {otherTag && (
                   <div className="absolute top-4 left-4 bg-red-600 text-white px-2 py-1 rounded-md z-10">

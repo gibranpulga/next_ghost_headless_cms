@@ -13,7 +13,7 @@ const PopularPosts = ({ posts }: PopularPostsProps) => {
       <ul>
         {posts.map((post) => (
           <li key={post.id} className="mb-4">
-            <Link href={`/read/${post.slug}`} legacyBehavior>
+            <Link href={`/noticia/${post.slug}`} legacyBehavior>
               <a className="flex items-center">
                 {post.feature_image && (
                   <Image

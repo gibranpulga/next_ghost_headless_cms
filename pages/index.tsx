@@ -2,7 +2,7 @@ import FeaturedSection from '../app/FeaturedSection';
 import PostsList from '../app/PostsList';
 import { GetStaticProps } from 'next';
 import type { PostsOrPages, SettingsResponse, PostOrPage } from '@tryghost/content-api';
-import { getPosts, getNavigation, getTagPosts } from '../app/ghost-client';
+import { getPosts, getNavigation, getTagPosts, getAllPages } from '../app/ghost-client';
 import RootLayout from '@/app/layout';
 import PopularPosts from '../app/PopularPosts'; // Import the new component
 import CustomFinancialWidget from '@/app/TradingViewWidget';
@@ -15,6 +15,7 @@ interface CmsData {
   popularPosts: PostsOrPages; // Add popularPosts to CmsData
   featuredPost: PostOrPage | null; // Add featuredPost to CmsData
   sidePosts: PostsOrPages; // Add sidePosts to CmsData
+  pages: PostsOrPages; // Add pages to CmsData
 }
 
 export const getStaticProps: GetStaticProps = async () => {
@@ -23,6 +24,7 @@ export const getStaticProps: GetStaticProps = async () => {
   let popularPosts: PostsOrPages | [];
   let featuredPost: PostOrPage | null = null;
   let sidePosts: PostsOrPages | [] = [];
+  let pages: PostsOrPages | [] = [];
 
   console.time('Index - getStaticProps');
 
@@ -30,6 +32,7 @@ export const getStaticProps: GetStaticProps = async () => {
     posts = await getPosts();
     settings = await getNavigation();
     popularPosts = await getTagPosts('mais-lidos'); // Fetch posts with the "mais-lidos" tag
+    pages = await getAllPages();
   } catch (error) {
     throw new Error('Index creation failed.');
   }
@@ -52,6 +55,7 @@ export const getStaticProps: GetStaticProps = async () => {
     popularPosts, // Include popularPosts in cmsData
     featuredPost, // Include featuredPost in cmsData
     sidePosts, // Include sidePosts in cmsData
+    pages, // Include pages in cmsData
   };
 
   console.timeEnd('Index - getStaticProps');
@@ -64,7 +68,7 @@ export const getStaticProps: GetStaticProps = async () => {
 };
 
 const Home = ({ cmsData }: { cmsData: CmsData }) => {
-  const { posts, popularPosts, featuredPost, sidePosts } = cmsData;
+  const { posts, popularPosts, featuredPost, sidePosts, pages } = cmsData;
 
   // Remaining posts
   const remainingPosts = posts.slice();
@@ -89,10 +93,10 @@ const Home = ({ cmsData }: { cmsData: CmsData }) => {
 };
 
 export default function Page({ cmsData }: { cmsData: CmsData }) {
-  const { settings } = cmsData;
+  const { settings, pages } = cmsData;
 
   return (
-    <RootLayout settings={settings}>
+    <RootLayout settings={settings} pages={pages}>
       <Home cmsData={cmsData} />
     </RootLayout>
   );
