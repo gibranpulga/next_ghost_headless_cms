@@ -1,10 +1,19 @@
 import Link from "next/link";
 import Image from "next/image";
 import { FaBars, FaSearch } from "react-icons/fa";
+import Head from "next/head";
 import type { Settings } from "@tryghost/content-api";
 
 function Header({ settings }: { settings: Settings }) {
   return (
+    <>
+    <Head>
+      <script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9927974438462387"
+        crossOrigin="anonymous"
+      ></script>
+    </Head>
     <header className="px-2 sm:px-4 py-2.5 w-full" style={{ backgroundColor: "white" }}>
       <div className="container flex flex-wrap items-center justify-between mx-auto">
 
@@ -49,6 +58,7 @@ function Header({ settings }: { settings: Settings }) {
         </button> */}
       </div>
     </header>
+    </>
   );
 }
 
