@@ -15,7 +15,7 @@ async function downloadImage(url, filepath) {
   });
 
   return new Promise((resolve, reject) => {
-    const writer = fs.createWriteStream(filepath);
+    const writer = fs.createWriteStream(cleanPath); // Use cleanPath here
     response.data.pipe(writer);
     let error = null;
     writer.on('error', (err) => {
@@ -51,6 +51,8 @@ function getCleanImageFilename(url) {
 }
 
 async function processPosts(posts) {
+  const urlMap = new Map();
+
   for (const post of posts) {
     const imageUrls = extractImageUrls(post.html);
 
@@ -66,8 +68,10 @@ async function processPosts(posts) {
       // Download the image
       await downloadImage(imageUrl, localPath);
 
-      // Replace the image URL in the post HTML with the local path
-      post.html = post.html.replace(imageUrl, `/images/${imageFilename}`);
+      // Store the original and escaped URLs in the map
+      const escapedImageUrl = imageUrl.replace(/&/g, '&amp;'); // Escape & characters
+      urlMap.set(imageUrl, `/images/${imageFilename}`);
+      urlMap.set(escapedImageUrl, `/images/${imageFilename}`);
     }
 
     // Update feature_image if it's null
@@ -78,9 +82,20 @@ async function processPosts(posts) {
       post.feature_image = `/images/${firstImageFilename}`;
     }
   }
+
+  return urlMap;
+}
+
+function replaceUrlsInPosts(posts, urlMap) {
+  for (const post of posts) {
+    for (const [originalUrl, localUrl] of urlMap) {
+      post.html = post.html.replace(new RegExp(originalUrl.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), localUrl);
+    }
+  }
 }
 
 module.exports = {
   processPosts,
+  replaceUrlsInPosts,
   downloadImage
 };

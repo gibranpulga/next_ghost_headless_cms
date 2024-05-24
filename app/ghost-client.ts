@@ -1,7 +1,7 @@
 import GhostContentAPI, { PostOrPage, GhostAPI, GhostError, PostsOrPages } from "@tryghost/content-api";
 import fs from 'fs';
 import path from 'path';
-import { processPosts, downloadImage } from './utils/downloadAndUpdateImages'; // Import the new function
+import { processPosts, replaceUrlsInPosts, downloadImage } from './utils/downloadAndUpdateImages'; // Import the new function
 
 // Create API instance with site credentials
 export const api: GhostAPI = new GhostContentAPI({
@@ -37,7 +37,11 @@ export async function getPosts() {
         throw error;
       });
 
-    await processPosts(posts);
+    const urlMap = await processPosts(posts);
+
+    console.log('posts: ', posts);
+
+    replaceUrlsInPosts(posts, urlMap);
 
     fs.mkdirSync(path.dirname(postsFilePath), { recursive: true });
     fs.writeFileSync(postsFilePath, JSON.stringify(posts, null, 2));
@@ -80,7 +84,8 @@ export async function getSinglePost(postSlug: string) {
   await addFeatureImageFromFirstImage(post);
 
   if (post) {
-    await processPosts([post]);
+    const urlMap = await processPosts([post]);
+    replaceUrlsInPosts([post], urlMap);
   }
 
   return post;
@@ -195,4 +200,3 @@ export async function getNavigation() {
       console.log(error);
     });
 }
-
