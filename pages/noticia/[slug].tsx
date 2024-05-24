@@ -8,8 +8,9 @@ import type { PostOrPage, PostsOrPages, SettingsResponse } from "@tryghost/conte
 import { format } from "date-fns";
 import RootLayout from "../../app/layout"; // Adjust the import path
 import "../../app/cards.min.css";
+import Head from 'next/head';
 
-interface ReadProps {
+interface NewsProps {
   post: PostOrPage;
   settings: SettingsResponse;
   pages: PostsOrPages;
@@ -55,14 +56,33 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 };
 
 // Component
-const Read = ({ post, settings, pages }: ReadProps) => {
+const News = ({ post, settings, pages }: NewsProps) => {
 
   if (!post) {
     return notFound();
   }
-  
+
+  const postUrl = `https://www.brasilnoar.com.br/noticia/${post.slug}`;
+  const postTitle = post.title;
+  const postDescription = post.excerpt || 'Bem-vindo ao Brasil No Ar, o seu portal de notícias confiável e dinâmico.';
+  const postImage = post.feature_image || '/images/Brasilnoar.png';
+
   return (
     <RootLayout settings={settings} pages={pages}>
+      <Head>
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={postUrl} />
+        <meta property="og:title" content={postTitle} />
+        <meta property="og:description" content={postDescription} />
+        <meta property="og:image" content={postImage} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={postTitle} />
+        <meta name="twitter:description" content={postDescription} />
+        <meta name="twitter:image" content={postImage} />
+        <title>{postTitle}</title>
+      </Head>
       <main className="pt-8 pb-16 lg:pt-16 lg:pb-24 dark:bg-gray-900">
         <div className="flex justify-between px-4 mx-auto max-w-screen-xl">
           <article className="mx-auto w-full max-w-3xl prose prose-xl prose-p:text-gray-800 dark:prose-p:text-gray-100 sm:prose-base prose-a:no-underline prose-blue dark:prose-invert">
@@ -87,17 +107,16 @@ const Read = ({ post, settings, pages }: ReadProps) => {
             <section className="mb-6">
               <p className="text-lg text-gray-700 dark:text-gray-300 italic">{post.excerpt}</p>
               <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-2">
-                <a  className="font-semibold text-gray-900 dark:text-white mr-2">
+                <a className="font-semibold text-gray-900 dark:text-white mr-2">
                   Por: {post.primary_author?.name} 
                 </a>
                 <time className="mr-2" dateTime={post.published_at}>
-                em {format(new Date(post.published_at), "dd/MM/yyyy 'as' HH:mm")}
+                  em {format(new Date(post.published_at), "dd/MM/yyyy 'as' HH:mm")}
                 </time>
                 <span>•</span>
                 <span className="ml-2">{post.reading_time} minutos de leitura</span>
               </div>
             </section>
-
 
             <div dangerouslySetInnerHTML={{ __html: post.html }}></div>
           </article>
@@ -107,4 +126,4 @@ const Read = ({ post, settings, pages }: ReadProps) => {
   );
 };
 
-export default Read;
+export default News;

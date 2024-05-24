@@ -9,7 +9,7 @@ import { format } from "date-fns";
 import RootLayout from "../app/layout"; // Adjust the import path
 import "../app/cards.min.css";
 
-interface ReadProps {
+interface PageProps {
   page: PostOrPage;
   settings: SettingsResponse;
   pages: PostsOrPages;
@@ -55,7 +55,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 };
 
 // Component
-const Read = ({ page, settings, pages }: ReadProps) => {
+const Page = ({ page, settings, pages }: PageProps) => {
 
 
   if (!page) {
@@ -101,4 +101,4 @@ const Read = ({ page, settings, pages }: ReadProps) => {
   );
 };
 
-export default Read;
+export default Page;
