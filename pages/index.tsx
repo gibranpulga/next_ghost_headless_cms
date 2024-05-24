@@ -33,6 +33,7 @@ export const getStaticProps: GetStaticProps = async () => {
     settings = await getNavigation();
     popularPosts = await getTagPosts('mais-lidos'); // Fetch posts with the "mais-lidos" tag
     pages = await getAllPages();
+    sidePosts = await getTagPosts('side-post'); // Fetch posts with the "side-post" tag
   } catch (error) {
     throw new Error('Index creation failed.');
   }
@@ -40,12 +41,11 @@ export const getStaticProps: GetStaticProps = async () => {
   // Find the most recent featured post
   featuredPost = posts.find(post => post.featured) || null;
 
-  // Filter out "mais-lidos" and "side-post" posts from the main posts
-  const filteredPosts = posts.filter(post => !post.tags.some(tag => tag.slug === 'mais-lidos' || tag.slug === 'side-post'));
+  // Filter out "mais-lidos" posts from the main posts
+  const filteredPosts = posts.filter(post => !post.tags.some(tag => tag.slug === 'mais-lidos'));
 
-  // Filter side posts and get the most recent 2
-  sidePosts = posts
-    .filter(post => post.tags.some(tag => tag.slug === 'side-post'))
+  // Get the most recent 2 side posts
+  sidePosts = sidePosts
     .sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime())
     .slice(0, 2);
 
@@ -68,7 +68,7 @@ export const getStaticProps: GetStaticProps = async () => {
 };
 
 const Home = ({ cmsData }: { cmsData: CmsData }) => {
-  const { posts, popularPosts, featuredPost, sidePosts, pages } = cmsData;
+  const { posts, popularPosts, featuredPost, sidePosts } = cmsData;
 
   // Remaining posts
   const remainingPosts = posts.slice();

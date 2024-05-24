@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getSinglePost, getPosts, getNavigation, getAllPages } from "../../app/ghost-client";
+import { getPosts, getNavigation, getAllPages, getSinglePost } from "../../app/ghost-client";
 import Image from "next/image";
 import { FaAngleLeft } from "react-icons/fa";
 import { notFound } from 'next/navigation';
@@ -37,7 +37,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     pages = await getAllPages();
 
   } catch (error) {
-    throw new Error('Getting posts failed.');
+    throw new Error('Getting posts failed: ' + error);
   }
 
   if (!post) {
@@ -97,19 +97,7 @@ const Read = ({ post, settings, pages }: ReadProps) => {
                 <span className="ml-2">{post.reading_time} minutos de leitura</span>
               </div>
             </section>
-            <figure>
-              <Image
-                className="mx-auto"
-                width={1000}
-                height={250}
-                src={post.feature_image}
-                alt={post.feature_image_alt}
-              />
-              <figcaption
-                className="text-center"
-                dangerouslySetInnerHTML={{ __html: post.feature_image_caption }}
-              ></figcaption>
-            </figure>
+
 
             <div dangerouslySetInnerHTML={{ __html: post.html }}></div>
           </article>

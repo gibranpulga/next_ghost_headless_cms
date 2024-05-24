@@ -9,6 +9,7 @@ interface RootLayoutProps {
 }
 
 export default function RootLayout({ children, settings, pages }: RootLayoutProps): JSX.Element {
+
   return (
     <BlogLayout setting={settings} pages={pages}>
       {children}
