@@ -21,7 +21,7 @@ function Footer({ settings, pages }: FooterProps) {
 
         <div className="flex md:order-2">
           <ul className="flex p-4 flex-row md:space-x-8 md:mt-0 md:text-sm font-medium text-white">
-            {pages.map((page: any) => (
+            {pages && pages.map((page: any) => (
               <li key={page.slug}>
                 <Link href={`/${page.slug}`}>{page.title}</Link>
               </li>

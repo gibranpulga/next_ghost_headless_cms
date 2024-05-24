@@ -11,7 +11,7 @@ function Header({ settings }: { settings: Settings }) {
 
         {/* Logo for blog */}
         <Link href="/" className="flex items-center">
-          {settings.logo ? (
+          {settings && settings.logo ? (
             <Image
               alt={settings.title}
               width={100}
@@ -19,8 +19,9 @@ function Header({ settings }: { settings: Settings }) {
               src={settings.logo}
               className="self-center"
             />
-          ) : (
+          ) : (settings && settings.title ?
             <span className="text-xl font-semibold whitespace-nowrap text-white">{settings.title}</span>
+          : null
           )}
         </Link>
 

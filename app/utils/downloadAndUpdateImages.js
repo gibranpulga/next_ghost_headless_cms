@@ -4,9 +4,14 @@ const axios = require('axios');
 const { JSDOM } = require('jsdom');
 
 async function downloadImage(url, filepath) {
+  let cleanPath = filepath.split('?')[0];
+  console.log('downloading', url, 'to', cleanPath);
+
   const response = await axios({
     url,
     responseType: 'stream',
+  }).catch(error => {
+    console.error('Axios error: ', error);
   });
 
   return new Promise((resolve, reject) => {
@@ -32,12 +37,27 @@ function extractImageUrls(html) {
   return Array.from(images).map(img => img.src);
 }
 
+function getCleanImageFilename(url) {
+  console.log('cleaning', url);
+  const urlObj = new URL(url);
+  const pathname = urlObj.pathname;
+  const extensionRegex = /\.(jpg|jpeg|png|gif|bmp|webp)$/i;
+  const match = pathname.match(extensionRegex);
+  if (match) {
+    return pathname.substring(pathname.lastIndexOf('/') + 1, match.index + match[0].length);
+  }
+  console.log('cleaned: ', pathname.substring(pathname.lastIndexOf('/') + 1));
+  return pathname.substring(pathname.lastIndexOf('/') + 1);
+}
+
 async function processPosts(posts) {
   for (const post of posts) {
     const imageUrls = extractImageUrls(post.html);
-    
+
     for (const imageUrl of imageUrls) {
-      const imageFilename = path.basename(imageUrl);
+      const imageFilename = getCleanImageFilename(imageUrl);
+      console.log('imageFilename', imageFilename);
+
       const localPath = path.join(process.cwd(), 'public', 'images', imageFilename);
 
       // Ensure the directory exists
@@ -48,13 +68,13 @@ async function processPosts(posts) {
 
       // Replace the image URL in the post HTML with the local path
       post.html = post.html.replace(imageUrl, `/images/${imageFilename}`);
-      
     }
 
     // Update feature_image if it's null
     if (!post.feature_image && imageUrls.length > 0) {
+      console.log('setting feature image');
       const firstImageUrl = imageUrls[0];
-      const firstImageFilename = path.basename(firstImageUrl);
+      const firstImageFilename = getCleanImageFilename(firstImageUrl);
       post.feature_image = `/images/${firstImageFilename}`;
     }
   }
