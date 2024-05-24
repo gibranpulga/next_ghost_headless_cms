@@ -3,8 +3,6 @@ import Link from "next/link";
 import type { PostOrPage } from "@tryghost/content-api";
 
 function FeaturedSection({ featuredPost, sidePosts }: { featuredPost: PostOrPage; sidePosts: PostOrPage[] }) {
-  console.log('featuredPost', featuredPost);
-  console.log('sidePosts', sidePosts);
 
   return (
     <div className="container mx-auto my-12 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-7xl px-4">

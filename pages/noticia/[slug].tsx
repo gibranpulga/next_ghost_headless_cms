@@ -76,7 +76,6 @@ const News = ({ post, settings, pages }: NewsProps) => {
         <meta property="og:description" content={postDescription} />
         <meta property="og:image" content={postImage} />
         <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={postTitle} />
         <meta name="twitter:description" content={postDescription} />
