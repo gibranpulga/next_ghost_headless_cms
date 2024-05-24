@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "npm run download-images && next build",
-    "download-images": "node downloadImages.js",
+    "download-images": "node app/utils/downloadAndUpdateImages.js", 
     "start": "next start",
     "lint": "next lint"
   },
