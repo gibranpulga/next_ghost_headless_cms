@@ -3,11 +3,13 @@ import Link from "next/link";
 import type { PostOrPage } from "@tryghost/content-api";
 
 function FeaturedSection({ featuredPost, sidePosts }: { featuredPost: PostOrPage; sidePosts: PostOrPage[] }) {
+  console.log('featuredPost', featuredPost);
+  console.log('sidePosts', sidePosts);
 
   return (
     <div className="container mx-auto my-12 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-7xl px-4">
       <div className="col-span-2 bg-white p-6 border border-gray-200 shadow-lg flex flex-col justify-center relative">
-        {featuredPost.primary_tag && (
+        {featuredPost && featuredPost.primary_tag && (
           <div className="absolute top-4 left-4 bg-red-600 text-white px-2 py-1 rounded-md z-10">
             {featuredPost.primary_tag.name}
           </div>
@@ -18,7 +20,7 @@ function FeaturedSection({ featuredPost, sidePosts }: { featuredPost: PostOrPage
         </Link>
       </div>
       <div className="grid grid-rows-2 gap-4">
-        {sidePosts.map((post, index) => {
+        {sidePosts && sidePosts.map((post, index) => {
           // Find the second tag, excluding 'side-post'
           const otherTag = post.tags.filter(tag => tag.slug !== 'side-post')[0];
 

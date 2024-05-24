@@ -5,7 +5,6 @@ const { JSDOM } = require('jsdom');
 
 async function downloadImage(url, filepath) {
   let cleanPath = filepath.split('?')[0];
-  console.log('downloading', url, 'to', cleanPath);
 
   const response = await axios({
     url,
@@ -38,7 +37,6 @@ function extractImageUrls(html) {
 }
 
 function getCleanImageFilename(url) {
-  console.log('cleaning', url);
   const urlObj = new URL(url);
   const pathname = urlObj.pathname;
   const extensionRegex = /\.(jpg|jpeg|png|gif|bmp|webp)$/i;
@@ -76,7 +74,6 @@ async function processPosts(posts) {
 
     // Update feature_image if it's null
     if (!post.feature_image && imageUrls.length > 0) {
-      console.log('setting feature image');
       const firstImageUrl = imageUrls[0];
       const firstImageFilename = getCleanImageFilename(firstImageUrl);
       post.feature_image = `/images/${firstImageFilename}`;
