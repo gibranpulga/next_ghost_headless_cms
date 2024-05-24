@@ -21,9 +21,9 @@ function extractFirstImageUrl(html: string): string | null {
 
 // Posts (Home page)
 export async function getPosts() {
-  const postsFilePath = path.join(process.cwd(), 'data', 'posts.json');
-
   let posts: PostsOrPages;
+
+  const postsFilePath = path.join(process.cwd(), 'data', 'posts.json');
 
   if (fs.existsSync(postsFilePath)) {
     posts = JSON.parse(fs.readFileSync(postsFilePath, 'utf-8'));
@@ -43,6 +43,14 @@ export async function getPosts() {
     fs.writeFileSync(postsFilePath, JSON.stringify(posts, null, 2));
   }
 
+  await processPostInsidePosts(posts);
+  return posts;
+}
+
+async function processPostInsidePosts(posts: PostsOrPages) {
+  for (const post of posts) {
+    await addFeatureImageFromFirstImage(post);
+  }
   return posts;
 }
 
@@ -69,12 +77,22 @@ export async function getSinglePost(postSlug: string) {
     });
 
   // Replace feature_image with the first image in the html if feature_image is null
+  await addFeatureImageFromFirstImage(post);
+
+  if (post) {
+    await processPosts([post]);
+  }
+
+  return post;
+}
+
+async function addFeatureImageFromFirstImage(post: void | PostOrPage) {
   if (post && !post.feature_image) {
     const firstImageUrl = extractFirstImageUrl(post.html);
     if (firstImageUrl) {
       const imageFilename = path.basename(firstImageUrl);
       const localPath = path.join(process.cwd(), 'public', 'images', imageFilename);
-      
+
       // Ensure the directory exists
       fs.mkdirSync(path.dirname(localPath), { recursive: true });
 
@@ -85,12 +103,6 @@ export async function getSinglePost(postSlug: string) {
       post.feature_image = `/images/${imageFilename}`;
     }
   }
-
-  if (post) {
-    await processPosts([post]);
-  }
-
-  return post;
 }
 
 // Pages (Page)
@@ -144,9 +156,12 @@ export async function getAllAuthors() {
 // Tag (Tag page)
 export async function getTagPosts(tagSlug: string) {
   return await api.posts.browse({ filter: `tag:${tagSlug}`, include: ['tags', 'count.posts'] })
-    .catch((error: Error) => {
-      console.log(error);
-    });
+  .then((posts) => {
+    return processPostInsidePosts(posts);
+  })
+  .catch((error: Error) => {
+    console.log(error);
+  });
 }
 
 export async function getSingleTag(tagSlug: string) {

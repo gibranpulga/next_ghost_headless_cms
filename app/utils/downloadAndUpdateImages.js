@@ -48,6 +48,7 @@ async function processPosts(posts) {
 
       // Replace the image URL in the post HTML with the local path
       post.html = post.html.replace(imageUrl, `/images/${imageFilename}`);
+      
     }
 
     // Update feature_image if it's null
