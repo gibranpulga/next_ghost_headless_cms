@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getSinglePost, getPosts, getNavigation } from "../../app/ghost-client";
+import { getSinglePost, getPosts, getNavigation, getAllPages } from "../../app/ghost-client";
 import Image from "next/image";
 import { FaAngleLeft } from "react-icons/fa";
 import { notFound } from 'next/navigation';
@@ -12,6 +12,7 @@ import "../../app/cards.min.css";
 interface ReadProps {
   post: PostOrPage;
   settings: SettingsResponse;
+  pages: PostsOrPages;
 }
 
 // generateStaticPaths
@@ -28,10 +29,12 @@ export const getStaticPaths: GetStaticPaths = async () => {
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   let settings;
   let post;
+  let pages;
   
   try {
     settings = await getNavigation();
     post = await getSinglePost(params?.slug as string);
+    pages = await getAllPages();
 
   } catch (error) {
     throw new Error('Getting posts failed.');
@@ -44,24 +47,22 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   return {
     props: {
       post,
-      settings
+      settings,
+      pages
     },
     revalidate: 60, // Optional: Revalidate every 60 seconds
   };
 };
 
 // Component
-const Read = ({ post, settings }: ReadProps) => {
-  console.log('settings getStaticProps', settings);
-  console.log('post getStaticProps', post);
-
+const Read = ({ post, settings, pages }: ReadProps) => {
 
   if (!post) {
     return notFound();
   }
   
   return (
-    <RootLayout settings={settings}>
+    <RootLayout settings={settings} pages={pages}>
       <main className="pt-8 pb-16 lg:pt-16 lg:pb-24 dark:bg-gray-900">
         <div className="flex justify-between px-4 mx-auto max-w-screen-xl">
           <article className="mx-auto w-full max-w-3xl prose prose-xl prose-p:text-gray-800 dark:prose-p:text-gray-100 sm:prose-base prose-a:no-underline prose-blue dark:prose-invert">
@@ -86,9 +87,9 @@ const Read = ({ post, settings }: ReadProps) => {
             <section className="mb-6">
               <p className="text-lg text-gray-700 dark:text-gray-300 italic">{post.excerpt}</p>
               <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-2">
-                <Link href={`/authors/${post.primary_author.slug}`} className="font-semibold text-gray-900 dark:text-white mr-2">
-                  Por: {post.primary_author.name} 
-                </Link>
+                <a  className="font-semibold text-gray-900 dark:text-white mr-2">
+                  Por: {post.primary_author?.name} 
+                </a>
                 <time className="mr-2" dateTime={post.published_at}>
                 em {format(new Date(post.published_at), "dd/MM/yyyy 'as' HH:mm")}
                 </time>
