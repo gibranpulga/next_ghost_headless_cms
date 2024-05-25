@@ -4,7 +4,6 @@ export default function Document() {
   return (
     <Html className="light" lang="en">
       <Head>
-      <script async type='text/javascript' src='//pl23399315.highcpmgate.com/dd/1b/ca/dd1bca653081750d51577c9ab46ce649.js'></script>
       
         {/* Google Analytics Script */}
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-8MGDX8XKCN"></script>
