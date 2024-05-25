@@ -4,7 +4,7 @@ export default function Document() {
   return (
     <Html className="light" lang="en">
       <Head>
-        {/* Google Analytics */}
+        {/* Google Analytics Script */}
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-8MGDX8XKCN"></script>
         <script
           dangerouslySetInnerHTML={{
@@ -46,6 +46,13 @@ export default function Document() {
       <body className="bg-[--bg-color] dark:bg-gray-900">
         <Main />
         <NextScript />
+        {/* Adsterra Script */}
+        <script
+          async="async"
+          data-cfasync="false"
+          src="//pl23399282.highcpmgate.com/643b3c63fd89ef6f1128ebc2de3df8cf/invoke.js"
+        ></script>
+        <div id="container-643b3c63fd89ef6f1128ebc2de3df8cf"></div>
       </body>
     </Html>
   );
