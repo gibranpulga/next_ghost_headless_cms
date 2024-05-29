@@ -8,20 +8,6 @@ import { getTagPosts } from './ghost-client';
 import Pagination from './Pagination';
 
 function PostsListTag({ initialPosts, totalPages, tagSlug }) {
-  const [posts, setPosts] = useState<PostOrPage[]>(initialPosts || []);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  useEffect(() => {
-    async function loadPosts() {
-      const newPosts = await getTagPosts(tagSlug, currentPage);;
-      setPosts(newPosts);
-    }
-    loadPosts();
-  }, [currentPage, tagSlug]);
-
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
 
   return (
     <div className="container mx-auto my-12 max-w-7xl px-4">

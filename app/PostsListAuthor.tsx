@@ -8,21 +8,6 @@ import { getSingleAuthorPosts } from './ghost-client'; // Assume you have this f
 import Pagination from './Pagination';
 
 function PostsListAuthor({ initialPosts, totalPages, authorSlug }) {
-  const [posts, setPosts] = useState<PostOrPage[]>(initialPosts || []);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  useEffect(() => {
-    async function loadPosts() {
-      const newPosts = await getSingleAuthorPosts(authorSlug, currentPage);
-      setPosts(newPosts);
-    }
-    loadPosts();
-  }, [currentPage, authorSlug]);
-
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
   return (
     <div className="container mx-auto my-12 max-w-7xl px-4">
       {posts.length > 0 ? (

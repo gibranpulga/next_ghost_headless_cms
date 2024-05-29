@@ -1,14 +1,16 @@
 import Link from "next/link";
 import { getPosts, getNavigation, getAllPages, getSinglePost } from "../../app/ghost-client";
-import Image from "next/image";
-import { FaAngleLeft } from "react-icons/fa";
-import { notFound } from 'next/navigation';
 import { GetStaticProps, GetStaticPaths } from "next";
 import type { PostOrPage, PostsOrPages, SettingsResponse } from "@tryghost/content-api";
 import { format } from "date-fns";
-import RootLayout from "../../app/layout"; // Adjust the import path
+import RootLayout from "../../app/layout";
 import "../../app/cards.min.css";
 import Head from 'next/head';
+import fs from 'fs';
+import path from 'path';
+import { FaAngleLeft } from "react-icons/fa";
+import { processPosts, processSinglePost, replaceUrlInSinglePost, replaceUrlsInPosts } from "@/app/utils/downloadAndUpdateImages";
+import { notFound } from "next/navigation";
 
 interface NewsProps {
   post: PostOrPage;
@@ -16,32 +18,73 @@ interface NewsProps {
   pages: PostsOrPages;
 }
 
-// generateStaticPaths
+// File paths for caching
+const postsFilePath = path.join(process.cwd(), 'data', 'posts.json');
+const settingsFilePath = path.join(process.cwd(), 'data', 'settings.json');
+const pagesFilePath = path.join(process.cwd(), 'data', 'pages.json');
+
 export const getStaticPaths: GetStaticPaths = async () => {
-  console.log("getStaticPaths slug")
-  const postsData: PostsOrPages = await getPosts();
-  const posts = postsData.posts;
+  console.log("getStaticPaths slug");
+  
+  let posts: PostsOrPages = [];
+
+  if (fs.existsSync(postsFilePath)) {
+    posts = JSON.parse(fs.readFileSync(postsFilePath, 'utf8'));
+  } else {
+    console.log('Creating new data files from noticia/[slug].tsx...');
+    
+    posts = await getPosts();
+    const urlMap = await processPosts(posts);
+    console.log('urlMap', urlMap);
+    replaceUrlsInPosts(posts, urlMap);
+
+    fs.mkdirSync(path.dirname(postsFilePath), { recursive: true });
+    fs.writeFileSync(postsFilePath, JSON.stringify(posts, null, 2));
+  }
   
   const paths = posts.map((post) => ({
     params: { slug: post.slug },
   }));
 
-  console.log("slug paths", paths)
-
   return { paths, fallback: "blocking" };
 };
 
-// generateStaticProps
 export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const slug = params?.slug as string;
+
   let settings;
   let post;
   let pages;
-  
-  try {
-    settings = await getNavigation();
-    post = await getSinglePost(params?.slug as string);
-    pages = await getAllPages();
 
+  try {
+    if (fs.existsSync(postsFilePath) && fs.existsSync(settingsFilePath) && fs.existsSync(pagesFilePath)) {
+      settings = JSON.parse(fs.readFileSync(settingsFilePath, 'utf8'));
+      pages = JSON.parse(fs.readFileSync(pagesFilePath, 'utf8'));
+
+      // Read data from existing JSON files
+      let posts : PostsOrPages = JSON.parse(fs.readFileSync(postsFilePath, 'utf8'));
+      post = posts.find((p: PostOrPage) => p.slug === slug);
+
+    }
+    if (!post || !fs.existsSync(postsFilePath) || !fs.existsSync(settingsFilePath) || !fs.existsSync(pagesFilePath)) {
+      console.log('Creating new data files from [slug].tsx...');
+
+      const singlePostFilePath = path.join(process.cwd(), 'data', 'posts', `${slug}.json`);
+
+      // Fetch data if JSON files do not exist
+      settings = await getNavigation();
+      post = await getSinglePost(slug);
+      pages = await getAllPages();
+
+      const urlMap = await processSinglePost(post);
+      replaceUrlInSinglePost(urlMap, post);
+
+      // Save fetched data to JSON files
+      fs.mkdirSync(path.dirname(singlePostFilePath), { recursive: true });
+      fs.writeFileSync(singlePostFilePath, JSON.stringify(post, null, 2));
+      fs.writeFileSync(settingsFilePath, JSON.stringify(settings, null, 2));
+      fs.writeFileSync(pagesFilePath, JSON.stringify(pages, null, 2));
+    } 
   } catch (error) {
     throw new Error('Getting posts failed: ' + error);
   }
@@ -54,15 +97,13 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     props: {
       post,
       settings,
-      pages
+      pages,
     },
     revalidate: 60, // Optional: Revalidate every 60 seconds
   };
 };
 
-// Component
 const News = ({ post, settings, pages }: NewsProps) => {
-
   if (!post) {
     return notFound();
   }

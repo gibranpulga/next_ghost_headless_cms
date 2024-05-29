@@ -46,6 +46,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
     if (!fs.existsSync(postsFilePath) || !fs.existsSync(settingsFilePath) || !fs.existsSync(pagesFilePath) || 
     !fs.existsSync(popularPostsFilePath) || !fs.existsSync(featuredPostFilePath) || !fs.existsSync(sidePostsFilePath)) {
+      console.log('Creating new data files from index...');
+
       posts = await getPosts();
       totalPages = Math.ceil(posts.length / 10);
       settings = await getNavigation();
@@ -56,10 +58,14 @@ export const getStaticProps: GetStaticProps = async (context) => {
       featuredPost = featuredPosts.find(item => !item.meta);
 
       // Process and download images
+      console.log('Processing posts...');
       const urlMap = await processPosts(posts);
+      console.log('Processing popular posts...');
       const urlMapPopularPosts = await processPosts(popularPosts);
+      console.log('Processing side posts...');
       const urlMapSidePosts = await processPosts(sidePosts);
       
+      console.log('Replacing URLs in posts...');
       replaceUrlsInPosts(posts, urlMap);
       replaceUrlsInPosts(popularPosts, urlMapPopularPosts);
       replaceUrlsInPosts(sidePosts, urlMapSidePosts);

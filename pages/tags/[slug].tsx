@@ -1,9 +1,13 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
-import { getAllPages, getAllTags, getNavigation, getSingleTag, getTagPosts } from '../../app/ghost-client';
+import { getNavigation, getSingleTag, getAllPages, getPosts, getAllTags } from '../../app/ghost-client';
 import type { Tag, PostsOrPages, SettingsResponse } from '@tryghost/content-api';
-import RootLayout from '../../app/layout'; // Adjust the import path
+import RootLayout from '../../app/layout';
 import '../../app/cards.min.css';
 import PostsListTag from '@/app/PostsListTag';
+import { ensureTagDataFiles } from '../../app/utils/dataUtils';
+import fs from 'fs';
+import path from 'path';
+import { processPosts, replaceUrlsInPosts } from '@/app/utils/downloadAndUpdateImages';
 
 interface TagPageProps {
   tag: Tag;
@@ -13,18 +17,32 @@ interface TagPageProps {
   totalPages: number;
 }
 
-// Generate static paths for each tag
+const tagsFilePath = path.join(process.cwd(), 'data', 'tags.json');
+const postsFilePath = path.join(process.cwd(), 'data', 'posts.json');
+const settingsFilePath = path.join(process.cwd(), 'data', 'settings.json');
+const pagesFilePath = path.join(process.cwd(), 'data', 'pages.json');
+
+
 export const getStaticPaths: GetStaticPaths = async () => {
-  const tags = await getAllTags();
-  const paths = tags.map(tag => ({
+  let tags;
+  
+  if (!fs.existsSync(tagsFilePath)) {
+    tags = await getAllTags();
+    fs.writeFileSync(tagsFilePath, JSON.stringify(tags, null, 2));
+  } else {
+    tags = JSON.parse(fs.readFileSync(tagsFilePath, 'utf8'));
+  }
+  const paths = tags.map((tag: Tag) => ({
     params: { slug: tag.slug },
   }));
 
   return { paths, fallback: 'blocking' };
 };
 
-// Fetch data for each tag page
 export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const slug = params?.slug as string;
+  
+
   let tag;
   let posts;
   let settings;
@@ -32,11 +50,37 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   let totalPages = 1;
 
   try {
-    settings = await getNavigation();
-    tag = await getSingleTag(params?.slug as string);
-    posts = await getTagPosts(params?.slug as string);
+    if (!fs.existsSync(postsFilePath) || !fs.existsSync(tagsFilePath) || !fs.existsSync(settingsFilePath) || !fs.existsSync(pagesFilePath)) {
+      console.log('Creating new data files from tags/[slug]...');
+
+      // Fetch data if JSON files do not exist
+      tag = await getSingleTag(slug);
+      posts = await getPosts();
+      settings = await getNavigation();
+      pages = await getAllPages();
+
+      const urlMap = await processPosts(posts);
+      replaceUrlsInPosts(posts, urlMap);
+
+      fs.mkdirSync(path.dirname(tagsFilePath), { recursive: true });
+      fs.mkdirSync(path.dirname(settingsFilePath), { recursive: true });
+      fs.mkdirSync(path.dirname(pagesFilePath), { recursive: true });
+      fs.mkdirSync(path.dirname(postsFilePath), { recursive: true });
+
+
+      fs.writeFileSync(tagsFilePath, JSON.stringify(tags, null, 2));
+      fs.writeFileSync(settingsFilePath, JSON.stringify(settings, null, 2));
+      fs.writeFileSync(pagesFilePath, JSON.stringify(pages, null, 2));
+      fs.writeFileSync(postsFilePath, JSON.stringify(posts, null, 2));
+    } else {
+      // Read data from existing JSON files
+      posts = JSON.parse(fs.readFileSync(postsFilePath, 'utf8'));
+      settings = JSON.parse(fs.readFileSync(settingsFilePath, 'utf8'));
+      pages = JSON.parse(fs.readFileSync(pagesFilePath, 'utf8'));
+      let tags = JSON.parse(fs.readFileSync(tagsFilePath, 'utf8'));
+      tag = tags.find((t: Tag) => t.slug === slug);
+    }
     totalPages = posts.meta.pagination.pages;
-    pages = await getAllPages();
   } catch (error) {
     return { notFound: true };
   }
@@ -57,7 +101,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   };
 };
 
-// Component for displaying the tag and its posts
 const TagPage = ({ tag, initialPosts, settings, pages, totalPages }: TagPageProps) => {
   return (
     <RootLayout settings={settings} pages={pages}>

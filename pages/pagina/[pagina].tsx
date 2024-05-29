@@ -3,11 +3,28 @@ import fs from 'fs';
 import path from 'path';
 import PostsListIndex from '../../app/PostsListIndex';
 import RootLayout from '@/app/layout';
-import { getAllPages, getNavigation } from '@/app/ghost-client';
+import { getAllPages, getNavigation, getPosts } from '@/app/ghost-client';
+import { processPosts, replaceUrlsInPosts } from '@/app/utils/downloadAndUpdateImages';
+import { PostsOrPages } from '@tryghost/content-api';
+
+
+const postsFilePath = path.join(process.cwd(), 'data', 'posts.json');
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const postsFilePath = path.join(process.cwd(), 'data', 'posts.json');
-  const posts = JSON.parse(fs.readFileSync(postsFilePath, 'utf-8'));
+  let posts: PostsOrPages = [];
+  
+  if (fs.existsSync(postsFilePath)) {
+    posts = JSON.parse(fs.readFileSync(postsFilePath, 'utf8'));
+  } else {
+    console.log('Creating new data files from pagina/[pagina]...');
+    
+    posts = await getPosts();
+    const urlMap = await processPosts(posts);
+    replaceUrlsInPosts(posts, urlMap);
+    
+    fs.mkdirSync(path.dirname(postsFilePath), { recursive: true });
+    fs.writeFileSync(postsFilePath, JSON.stringify(posts, null, 2));
+  }
   //console.log("posts", posts)
   const totalPages = Math.ceil(posts.length / 10);
 
@@ -24,7 +41,6 @@ export const getStaticPaths: GetStaticPaths = async () => {
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   const pageArray = params?.pagina as string[];
   const page = pageArray ? parseInt(pageArray[0], 10) : 1;
-  const postsFilePath = path.join(process.cwd(), 'data', 'posts.json');
   
   const posts = JSON.parse(fs.readFileSync(postsFilePath, 'utf-8'));
 
