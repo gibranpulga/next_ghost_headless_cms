@@ -80,6 +80,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       let tags = JSON.parse(fs.readFileSync(tagsFilePath, 'utf8'));
       tag = tags.find((t: Tag) => t.slug === slug);
     }
+    // THIS DOESNT EXIST ON POSTS IF COMES FROM JSON
     totalPages = posts.meta.pagination.pages;
   } catch (error) {
     return { notFound: true };
