@@ -10,18 +10,4 @@ function extractFirstImageUrl(html) {
   return img ? img.src : null;
 }
 
-async function addFeatureImageFromFirstImage(post) {
-  if (post && !post.feature_image) {
-    const firstImageUrl = extractFirstImageUrl(post.html);
-    if (firstImageUrl) {
-      const imageFilename = path.basename(firstImageUrl);
-      const localPath = path.join(process.cwd(), 'public', 'images', imageFilename);
-
-      fs.mkdirSync(path.dirname(localPath), { recursive: true });
-      await downloadImage(firstImageUrl, localPath);
-
-      post.feature_image = `/images/${imageFilename}`;
-    }
-  }
-}
 

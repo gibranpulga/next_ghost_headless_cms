@@ -75,11 +75,8 @@ function replaceUrlsInPosts(posts, urlMap) {
 }
 
 function replaceUrlInSinglePost(urlMap, post) {
-  console.log('urlMap', urlMap);
 
   for (const [originalUrl, localUrl] of urlMap) {
-    console.log('originalUrl', originalUrl);
-    console.log('localUrl', localUrl);
     post.html = post.html.replace(new RegExp(originalUrl.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), localUrl);
   }
   

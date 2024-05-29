@@ -98,6 +98,9 @@ export const getStaticProps: GetStaticProps = async (context) => {
   const filteredPosts = posts.filter(post => !post.tags.some(tag => tag.slug === 'mais-lidos'));
   sidePosts = sidePosts.sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime()).slice(0, 2);
 
+  console.log('posts.length: ', posts.length);
+  console.log('totalPages: ', totalPages);
+
   const cmsData = {
     settings,
     posts: filteredPosts,
