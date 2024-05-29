@@ -1,32 +1,12 @@
-import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { PostOrPage } from "@tryghost/content-api";
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { getPosts } from './ghost-client';
 import Pagination from './Pagination';
 
-function PostsListIndex({ initialPosts, totalPages }) {
-  const [posts, setPosts] = useState<PostOrPage[]>(initialPosts || []);
-  const [currentPage, setCurrentPage] = useState(1);
-  console.log('posts.length', posts.length);
-  console.log('currentPage', currentPage);
-  console.log('totalPages', totalPages);
-
-  
-  useEffect(() => {
-    async function loadPosts() {
-      let newPosts = await getPosts(10, currentPage);
-      setPosts(newPosts);
-    }
-
-    loadPosts();
-  }, [currentPage]);
-
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
+function PostsListIndex({ initialPosts, totalPages, currentPage }) {
+  const posts = initialPosts;
 
   return (
     <div className="container mx-auto my-12 max-w-7xl px-4">
@@ -66,7 +46,7 @@ function PostsListIndex({ initialPosts, totalPages }) {
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
-        onPageChange={handlePageChange}
+        onPageChange={(page) => window.location.href = `/pagina/${page}`}
       />
     </div>
   );

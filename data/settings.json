@@ -1,0 +1,63 @@
+{
+  "title": "Brasil no Ar",
+  "description": "Notícias relevantes sobre o Brasil",
+  "logo": "https://ghost-test-2.ghost.io/content/images/2024/05/Brasilnoar-removebg-preview.png",
+  "icon": null,
+  "accent_color": "#FF1A75",
+  "cover_image": "https://static.ghost.org/v5.0.0/images/publication-cover.jpg",
+  "facebook": "ghost",
+  "twitter": "@ghost",
+  "lang": "pt-BR",
+  "locale": "pt-BR",
+  "timezone": "Etc/UTC",
+  "codeinjection_head": null,
+  "codeinjection_foot": null,
+  "navigation": [
+    {
+      "label": "Home",
+      "url": "/"
+    },
+    {
+      "label": "About",
+      "url": "/about/"
+    }
+  ],
+  "secondary_navigation": [
+    {
+      "label": "Sign up",
+      "url": "#/portal/"
+    }
+  ],
+  "meta_title": null,
+  "meta_description": null,
+  "og_image": null,
+  "og_title": null,
+  "og_description": null,
+  "twitter_image": null,
+  "twitter_title": null,
+  "twitter_description": null,
+  "members_support_address": "noreply",
+  "members_enabled": true,
+  "allow_self_signup": true,
+  "members_invite_only": false,
+  "paid_members_enabled": false,
+  "firstpromoter_account": null,
+  "portal_button_style": "icon-and-text",
+  "portal_button_signup_text": "Subscribe",
+  "portal_button_icon": null,
+  "portal_signup_terms_html": null,
+  "portal_signup_checkbox_required": false,
+  "portal_plans": [
+    "free"
+  ],
+  "portal_default_plan": "yearly",
+  "portal_name": true,
+  "portal_button": true,
+  "comments_enabled": "off",
+  "recommendations_enabled": false,
+  "outbound_link_tagging": true,
+  "default_email_address": "ghost-test-2@ghost.io",
+  "support_email_address": "noreply@ghost-test-2.ghost.io",
+  "url": "https://ghost-test-2.ghost.io/",
+  "version": "5.82"
+}

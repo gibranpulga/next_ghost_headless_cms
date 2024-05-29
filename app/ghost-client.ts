@@ -8,12 +8,11 @@ export const api: GhostAPI = new GhostContentAPI({
   version: "v5.0"
 });
 
-export async function getPosts(limit = 10, page = 1) {
+export async function getPosts() {
   return await api.posts
     .browse({
       include: ["tags", "authors"],
-      limit: limit,
-      page: page
+      limit: "all",
     })
     .catch((error) => {
       console.log(error);

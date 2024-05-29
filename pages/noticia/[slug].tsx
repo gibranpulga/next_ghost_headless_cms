@@ -18,12 +18,15 @@ interface NewsProps {
 
 // generateStaticPaths
 export const getStaticPaths: GetStaticPaths = async () => {
+  console.log("getStaticPaths slug")
   const postsData: PostsOrPages = await getPosts();
   const posts = postsData.posts;
   
   const paths = posts.map((post) => ({
     params: { slug: post.slug },
   }));
+
+  console.log("slug paths", paths)
 
   return { paths, fallback: "blocking" };
 };

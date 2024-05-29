@@ -21,10 +21,13 @@ interface CmsData {
   sidePosts: PostsOrPages; // Add sidePosts to CmsData
   pages: PostsOrPages; // Add pages to CmsData
   totalPages: number; // Add totalPages to CmsData
+  currentPage: number; // Add currentPage to CmsData
 }
-//
 
-export const getStaticProps: GetStaticProps = async () => {
+
+export const getStaticProps: GetStaticProps = async (context) => {
+  const currentPage = context.params?.page ? parseInt(context.params.page as string, 10) : 1;
+
   let settings;
   let posts = [];
   let popularPosts = [];
@@ -34,9 +37,17 @@ export const getStaticProps: GetStaticProps = async () => {
   let totalPages = 1;
 
   try {
-    if (process.env.NODE_ENV === 'development' || !fs.existsSync(postsFilePath)) {
+    const postsFilePath = path.join(process.cwd(), 'data', 'posts.json');
+    const settingsFilePath = path.join(process.cwd(), 'data', 'settings.json');
+    const pagesFilePath = path.join(process.cwd(), 'data', 'pages.json');
+    const popularPostsFilePath = path.join(process.cwd(), 'data', 'popular-posts.json');
+    const featuredPostFilePath = path.join(process.cwd(), 'data', 'featured-post.json');
+    const sidePostsFilePath = path.join(process.cwd(), 'data', 'side-posts.json');
+
+    if (!fs.existsSync(postsFilePath) || !fs.existsSync(settingsFilePath) || !fs.existsSync(pagesFilePath) || 
+    !fs.existsSync(popularPostsFilePath) || !fs.existsSync(featuredPostFilePath) || !fs.existsSync(sidePostsFilePath)) {
       posts = await getPosts();
-      totalPages = posts.meta.pagination.pages;
+      totalPages = Math.ceil(posts.length / 10);
       settings = await getNavigation();
       popularPosts = await getTagPosts('mais-lidos');
       pages = await getAllPages();
@@ -46,13 +57,33 @@ export const getStaticProps: GetStaticProps = async () => {
 
       // Process and download images
       const urlMap = await processPosts(posts);
-      replaceUrlsInPosts(posts, urlMap);
+      const urlMapPopularPosts = await processPosts(popularPosts);
+      const urlMapSidePosts = await processPosts(sidePosts);
       
-      const postsFilePath = path.join(process.cwd(), 'data', 'posts.json');
+      replaceUrlsInPosts(posts, urlMap);
+      replaceUrlsInPosts(popularPosts, urlMapPopularPosts);
+      replaceUrlsInPosts(sidePosts, urlMapSidePosts);
+      
       fs.mkdirSync(path.dirname(postsFilePath), { recursive: true });
+      fs.mkdirSync(path.dirname(popularPostsFilePath), { recursive: true });
+      fs.mkdirSync(path.dirname(sidePostsFilePath), { recursive: true });
+      fs.mkdirSync(path.dirname(featuredPostFilePath), { recursive: true });
+      fs.mkdirSync(path.dirname(settingsFilePath), { recursive: true });
+      fs.mkdirSync(path.dirname(pagesFilePath), { recursive: true });
+
       fs.writeFileSync(postsFilePath, JSON.stringify(posts, null, 2));
+      fs.writeFileSync(popularPostsFilePath, JSON.stringify(popularPosts, null, 2));
+      fs.writeFileSync(sidePostsFilePath, JSON.stringify(sidePosts, null, 2));
+      fs.writeFileSync(featuredPostFilePath, JSON.stringify(featuredPost, null, 2));
+      fs.writeFileSync(settingsFilePath, JSON.stringify(settings, null, 2));
+      fs.writeFileSync(pagesFilePath, JSON.stringify(pages, null, 2));
     } else {
       posts = JSON.parse(fs.readFileSync(postsFilePath, 'utf8'));
+      popularPosts = JSON.parse(fs.readFileSync(popularPostsFilePath, 'utf8'));
+      sidePosts = JSON.parse(fs.readFileSync(sidePostsFilePath, 'utf8'));
+      featuredPost = JSON.parse(fs.readFileSync(featuredPostFilePath, 'utf8'));
+      settings = JSON.parse(fs.readFileSync(settingsFilePath, 'utf8'));
+      pages = JSON.parse(fs.readFileSync(pagesFilePath, 'utf8'));
     }
   } catch (error) {
     throw new Error('Index creation failed: ' + error);
@@ -69,6 +100,7 @@ export const getStaticProps: GetStaticProps = async () => {
     sidePosts,
     pages,
     totalPages,
+    currentPage,
   };
 
   return {
@@ -82,7 +114,9 @@ export const getStaticProps: GetStaticProps = async () => {
 
 
 const Home = ({ cmsData }: { cmsData: CmsData }) => {
-  const { posts, popularPosts, featuredPost, sidePosts, totalPages } = cmsData;
+  const { posts, popularPosts, featuredPost, sidePosts, totalPages, currentPage } = cmsData;
+  const initialPosts = posts.slice(0, 10); // Show the first 10 posts initially
+
 
   return (
     <main className="bg-gray-100 min-h-screen flex flex-col">
@@ -90,7 +124,7 @@ const Home = ({ cmsData }: { cmsData: CmsData }) => {
         <FeaturedSection featuredPost={featuredPost} sidePosts={sidePosts} />
         <div className="flex flex-col md:flex-row mt-8">
           <div className="flex-grow md:w-3/4 md:pr-4">
-          <PostsListIndex initialPosts={posts} totalPages={totalPages} />
+          <PostsListIndex initialPosts={initialPosts} totalPages={totalPages} currentPage={currentPage} />
           </div>
           <aside className="md:w-1/4 md:pl-4">
             <PopularPosts posts={popularPosts} />

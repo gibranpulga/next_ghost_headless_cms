@@ -1,6 +1,6 @@
-import React from 'react';
+import Link from 'next/link';
 
-const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+const Pagination = ({ currentPage, totalPages }) => {
   const pageNumbers = [];
 
   for (let i = 1; i <= totalPages; i++) {
@@ -9,41 +9,47 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
 
   const renderPageNumbers = () => {
     return pageNumbers.map(number => {
-      if (number === 1 || number === totalPages || (number >= currentPage - 1 && number <= currentPage + 1)) {
-        return (
-          <button
-            key={number}
-            onClick={() => onPageChange(number)}
+      const href = number === 1 ? '/' : `/pagina/${number}`;
+      return (
+        <Link key={number} href={href} legacyBehavior>
+          <a
             className={`px-4 py-2 ${currentPage === number ? 'bg-green-300' : 'bg-gray-200'} rounded hover:bg-gray-300 mx-1`}
           >
             {number}
-          </button>
-        );
-      } else if (number === currentPage - 2 || number === currentPage + 2) {
-        return <span key={number} className="px-2">...</span>;
-      } else {
-        return null;
-      }
+          </a>
+        </Link>
+      );
     });
   };
 
+  const prevPageHref = currentPage === 2 ? '/' : `/pagina/${currentPage - 1}`;
+  const nextPageHref = `/pagina/${currentPage + 1}`;
+
   return (
     <div className="flex justify-center mt-8">
-      <button
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-        className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 mx-1"
-      >
-        Anterior
-      </button>
+      <Link href={prevPageHref} legacyBehavior>
+        <a
+          className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 mx-1"
+          onClick={(e) => {
+            e.preventDefault();
+          }}
+          disabled={currentPage === 1}
+        >
+          Anterior
+        </a>
+      </Link>
       {renderPageNumbers()}
-      <button
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-        className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 mx-1"
-      >
-        Próxima
-      </button>
+      <Link href={nextPageHref} legacyBehavior>
+        <a
+          className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 mx-1"
+          onClick={(e) => {
+            e.preventDefault();
+          }}
+          disabled={currentPage === totalPages}
+        >
+          Próxima
+        </a>
+      </Link>
     </div>
   );
 };
