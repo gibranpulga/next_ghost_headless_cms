@@ -1,16 +1,16 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
-import Link from 'next/link';
 import { getAllPages, getAllTags, getNavigation, getSingleTag, getTagPosts } from '../../app/ghost-client';
 import type { Tag, PostsOrPages, SettingsResponse } from '@tryghost/content-api';
 import RootLayout from '../../app/layout'; // Adjust the import path
 import '../../app/cards.min.css';
-import PostsList from '../../app/PostsList'; // Adjust the import path
+import PostsListTag from '@/app/PostsListTag';
 
 interface TagPageProps {
   tag: Tag;
-  posts: PostsOrPages;
+  initialPosts: PostsOrPages;
   settings: SettingsResponse;
   pages: PostsOrPages;
+  totalPages: number;
 }
 
 // Generate static paths for each tag
@@ -29,11 +29,13 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   let posts;
   let settings;
   let pages;
+  let totalPages = 1;
 
   try {
     settings = await getNavigation();
     tag = await getSingleTag(params?.slug as string);
     posts = await getTagPosts(params?.slug as string);
+    totalPages = posts.meta.pagination.pages;
     pages = await getAllPages();
   } catch (error) {
     return { notFound: true };
@@ -46,15 +48,17 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   return {
     props: {
       tag,
-      posts,
+      initialPosts: posts,
       settings,
-      pages
-    }
+      pages,
+      totalPages,
+    },
+    revalidate: 60,
   };
 };
 
 // Component for displaying the tag and its posts
-const TagPage = ({ tag, posts, settings, pages }: TagPageProps) => {
+const TagPage = ({ tag, initialPosts, settings, pages, totalPages }: TagPageProps) => {
   return (
     <RootLayout settings={settings} pages={pages}>
       <main className="pt-8 pb-16 lg:pt-16 lg:pb-24 dark:bg-gray-900">
@@ -64,7 +68,7 @@ const TagPage = ({ tag, posts, settings, pages }: TagPageProps) => {
               #{tag.name}
             </h1>
             <section>
-              <PostsList posts={posts} />
+              <PostsListTag initialPosts={initialPosts} totalPages={totalPages} tagSlug={tag.slug} />
             </section>
           </article>
         </div>

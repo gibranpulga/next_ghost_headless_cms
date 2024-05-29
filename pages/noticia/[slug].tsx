@@ -18,7 +18,9 @@ interface NewsProps {
 
 // generateStaticPaths
 export const getStaticPaths: GetStaticPaths = async () => {
-  const posts: PostsOrPages = await getPosts();
+  const postsData: PostsOrPages = await getPosts();
+  const posts = postsData.posts;
+  
   const paths = posts.map((post) => ({
     params: { slug: post.slug },
   }));
