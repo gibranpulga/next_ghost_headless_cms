@@ -14,6 +14,7 @@ function PostsListIndex({ initialPosts, totalPages }) {
   console.log('currentPage', currentPage);
   console.log('totalPages', totalPages);
 
+  
   useEffect(() => {
     async function loadPosts() {
       let newPosts = await getPosts(10, currentPage);

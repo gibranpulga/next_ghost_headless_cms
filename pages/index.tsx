@@ -24,7 +24,7 @@ interface CmsData {
 }
 //
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getStaticProps: GetStaticProps = async (contex) => {
   let settings;
   let posts = [];
   let popularPosts = [];
@@ -34,22 +34,26 @@ export const getStaticProps: GetStaticProps = async () => {
   let totalPages = 1;
 
   try {
-    posts = await getPosts();
-    totalPages = posts.meta.pagination.pages;
-    settings = await getNavigation();
-    popularPosts = await getTagPosts('mais-lidos');
-    pages = await getAllPages();
-    sidePosts = await getTagPosts('side-post');
-    let featuredPosts = await getFeaturedPost();
-    featuredPost = featuredPosts.find(item => !item.meta);
+    if (process.env.NODE_ENV === 'development' || !fs.existsSync(postsFilePath)) {
+      posts = await getPosts();
+      totalPages = posts.meta.pagination.pages;
+      settings = await getNavigation();
+      popularPosts = await getTagPosts('mais-lidos');
+      pages = await getAllPages();
+      sidePosts = await getTagPosts('side-post');
+      let featuredPosts = await getFeaturedPost();
+      featuredPost = featuredPosts.find(item => !item.meta);
 
-    // Process and download images
-    const urlMap = await processPosts(posts);
-    replaceUrlsInPosts(posts, urlMap);
-    
-    const postsFilePath = path.join(process.cwd(), 'data', 'posts.json');
-    fs.mkdirSync(path.dirname(postsFilePath), { recursive: true });
-    fs.writeFileSync(postsFilePath, JSON.stringify(posts, null, 2));
+      // Process and download images
+      const urlMap = await processPosts(posts);
+      replaceUrlsInPosts(posts, urlMap);
+      
+      const postsFilePath = path.join(process.cwd(), 'data', 'posts.json');
+      fs.mkdirSync(path.dirname(postsFilePath), { recursive: true });
+      fs.writeFileSync(postsFilePath, JSON.stringify(posts, null, 2));
+    } else {
+      posts = JSON.parse(fs.readFileSync(postsFilePath, 'utf8'));
+    }
   } catch (error) {
     throw new Error('Index creation failed: ' + error);
   }
@@ -79,9 +83,6 @@ export const getStaticProps: GetStaticProps = async () => {
 
 const Home = ({ cmsData }: { cmsData: CmsData }) => {
   const { posts, popularPosts, featuredPost, sidePosts, totalPages } = cmsData;
-  const [currentPosts, setCurrentPosts] = useState<PostOrPage[]>(posts);
-  const [currentPage, setCurrentPage] = useState(1);
-
 
   return (
     <main className="bg-gray-100 min-h-screen flex flex-col">
