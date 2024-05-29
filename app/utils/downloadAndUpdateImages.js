@@ -69,12 +69,12 @@ function getCleanImageFilename(url) {
 
 function replaceUrlsInPosts(posts, urlMap) {
   for (const post of posts) {
-    replaceUrlInSinglePost(urlMap, post);
+    replaceUrlsInSinglePost(urlMap, post);
   }
 
 }
 
-function replaceUrlInSinglePost(urlMap, post) {
+function replaceUrlsInSinglePost(urlMap, post) {
 
   for (const [originalUrl, localUrl] of urlMap) {
     post.html = post.html.replace(new RegExp(originalUrl.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), localUrl);
@@ -115,5 +115,5 @@ module.exports = {
   replaceUrlsInPosts,
   downloadImage,
   processSinglePost,
-  replaceUrlInSinglePost,
+  replaceUrlsInSinglePost,
 };

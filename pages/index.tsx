@@ -8,7 +8,7 @@ import PopularPosts from '../app/PopularPosts'; // Import the new component
 import CustomFinancialWidget from '@/app/TradingViewWidget';
 import HoroscopeWidget from '@/app/HoroscopeWidget';
 import { useState, useEffect } from "react";
-import { processPosts, replaceUrlsInPosts } from '../app/utils/downloadAndUpdateImages';
+import { processPosts, processSinglePost, replaceUrlsInPosts, replaceUrlsInSinglePost } from '../app/utils/downloadAndUpdateImages';
 import fs from 'fs';
 import path from 'path';
 
@@ -49,7 +49,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
       console.log('Creating new data files from index...');
 
       posts = await getPosts();
-      totalPages = Math.ceil(posts.length / 10);
       settings = await getNavigation();
       popularPosts = await getTagPosts('mais-lidos');
       pages = await getAllPages();
@@ -58,17 +57,15 @@ export const getStaticProps: GetStaticProps = async (context) => {
       featuredPost = featuredPosts.find(item => !item.meta);
 
       // Process and download images
-      console.log('Processing posts...');
       const urlMap = await processPosts(posts);
-      console.log('Processing popular posts...');
       const urlMapPopularPosts = await processPosts(popularPosts);
-      console.log('Processing side posts...');
       const urlMapSidePosts = await processPosts(sidePosts);
+      const urlMapFeaturedPost = await processSinglePost(featuredPost);
       
-      console.log('Replacing URLs in posts...');
       replaceUrlsInPosts(posts, urlMap);
       replaceUrlsInPosts(popularPosts, urlMapPopularPosts);
       replaceUrlsInPosts(sidePosts, urlMapSidePosts);
+      replaceUrlsInSinglePost(featuredPost, urlMapFeaturedPost);
       
       fs.mkdirSync(path.dirname(postsFilePath), { recursive: true });
       fs.mkdirSync(path.dirname(popularPostsFilePath), { recursive: true });
@@ -95,11 +92,9 @@ export const getStaticProps: GetStaticProps = async (context) => {
     throw new Error('Index creation failed: ' + error);
   }
 
+  totalPages = Math.ceil(posts.length / 10);
   const filteredPosts = posts.filter(post => !post.tags.some(tag => tag.slug === 'mais-lidos'));
   sidePosts = sidePosts.sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime()).slice(0, 2);
-
-  console.log('posts.length: ', posts.length);
-  console.log('totalPages: ', totalPages);
 
   const cmsData = {
     settings,
@@ -120,12 +115,9 @@ export const getStaticProps: GetStaticProps = async (context) => {
   };
 };
 
-
-
 const Home = ({ cmsData }: { cmsData: CmsData }) => {
   const { posts, popularPosts, featuredPost, sidePosts, totalPages, currentPage } = cmsData;
   const initialPosts = posts.slice(0, 10); // Show the first 10 posts initially
-
 
   return (
     <main className="bg-gray-100 min-h-screen flex flex-col">
