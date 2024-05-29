@@ -2,7 +2,7 @@ import FeaturedSection from '../app/FeaturedSection';
 import PostsListIndex from '@/app/PostsListIndex';
 import { GetStaticProps } from 'next';
 import type { PostsOrPages, SettingsResponse, PostOrPage } from '@tryghost/content-api';
-import { getPosts, getNavigation, getTagPosts, getAllPages } from '../app/ghost-client';
+import { getPosts, getNavigation, getTagPosts, getAllPages, getFeaturedPost } from '../app/ghost-client';
 import RootLayout from '@/app/layout';
 import PopularPosts from '../app/PopularPosts'; // Import the new component
 import CustomFinancialWidget from '@/app/TradingViewWidget';
@@ -20,6 +20,7 @@ interface CmsData {
   pages: PostsOrPages; // Add pages to CmsData
   totalPages: number; // Add totalPages to CmsData
 }
+//
 
 export const getStaticProps: GetStaticProps = async () => {
   let settings;
@@ -40,11 +41,13 @@ export const getStaticProps: GetStaticProps = async () => {
     popularPosts = await getTagPosts('mais-lidos');
     pages = await getAllPages();
     sidePosts = await getTagPosts('side-post');
+    let featuredPosts = await getFeaturedPost();
+    featuredPost = featuredPosts.find(item => !item.meta);
   } catch (error) {
     throw new Error('Index creation failed: ' + error);
   }
 
-  featuredPost = posts.find(post => post.featured) || null;
+  
 
   const filteredPosts = posts.filter(post => !post.tags.some(tag => tag.slug === 'mais-lidos'));
   sidePosts = sidePosts.sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime()).slice(0, 2);

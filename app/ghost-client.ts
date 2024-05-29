@@ -15,6 +15,13 @@ export async function getPosts(page = 1) {
   return posts;
 }
 
+export async function getFeaturedPost() {
+  return await api.posts.browse({ filter: "featured:true", limit: "all" })
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
 export async function getSinglePost(postSlug: string) {
   const post = await api.posts
     .read({
