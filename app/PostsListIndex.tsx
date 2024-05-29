@@ -10,13 +10,16 @@ import Pagination from './Pagination';
 function PostsListIndex({ initialPosts, totalPages }) {
   const [posts, setPosts] = useState<PostOrPage[]>(initialPosts || []);
   const [currentPage, setCurrentPage] = useState(1);
+  console.log('posts.length', posts.length);
+  console.log('currentPage', currentPage);
+  console.log('totalPages', totalPages);
 
   useEffect(() => {
     async function loadPosts() {
-      const newPostsData = await getPosts(currentPage);
-      const newPosts = newPostsData.posts;
+      let newPosts = await getPosts(10, currentPage);
       setPosts(newPosts);
     }
+
     loadPosts();
   }, [currentPage]);
 

@@ -8,7 +8,9 @@ import PopularPosts from '../app/PopularPosts'; // Import the new component
 import CustomFinancialWidget from '@/app/TradingViewWidget';
 import HoroscopeWidget from '@/app/HoroscopeWidget';
 import { useState, useEffect } from "react";
-
+import { processPosts, replaceUrlsInPosts } from '../app/utils/downloadAndUpdateImages';
+import fs from 'fs';
+import path from 'path';
 
 
 interface CmsData {
@@ -31,23 +33,26 @@ export const getStaticProps: GetStaticProps = async () => {
   let pages = [];
   let totalPages = 1;
 
-  console.time('Index - getStaticProps');
-
   try {
-    const postsData = await getPosts();
-    posts = postsData.posts;
-    totalPages = postsData.meta.pagination.pages;
+    posts = await getPosts();
+    totalPages = posts.meta.pagination.pages;
     settings = await getNavigation();
     popularPosts = await getTagPosts('mais-lidos');
     pages = await getAllPages();
     sidePosts = await getTagPosts('side-post');
     let featuredPosts = await getFeaturedPost();
     featuredPost = featuredPosts.find(item => !item.meta);
+
+    // Process and download images
+    const urlMap = await processPosts(posts);
+    replaceUrlsInPosts(posts, urlMap);
+    
+    const postsFilePath = path.join(process.cwd(), 'data', 'posts.json');
+    fs.mkdirSync(path.dirname(postsFilePath), { recursive: true });
+    fs.writeFileSync(postsFilePath, JSON.stringify(posts, null, 2));
   } catch (error) {
     throw new Error('Index creation failed: ' + error);
   }
-
-  
 
   const filteredPosts = posts.filter(post => !post.tags.some(tag => tag.slug === 'mais-lidos'));
   sidePosts = sidePosts.sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime()).slice(0, 2);
@@ -61,8 +66,6 @@ export const getStaticProps: GetStaticProps = async () => {
     pages,
     totalPages,
   };
-
-  console.timeEnd('Index - getStaticProps');
 
   return {
     props: {
@@ -79,15 +82,6 @@ const Home = ({ cmsData }: { cmsData: CmsData }) => {
   const [currentPosts, setCurrentPosts] = useState<PostOrPage[]>(posts);
   const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => {
-    async function loadPosts() {
-      const postsData = await getPosts(currentPage);
-      setCurrentPosts(postsData.posts);
-    }
-    if (currentPage > 1) {
-      loadPosts();
-    }
-  }, [currentPage]);
 
   return (
     <main className="bg-gray-100 min-h-screen flex flex-col">

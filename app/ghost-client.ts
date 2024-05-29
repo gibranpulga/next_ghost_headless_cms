@@ -1,4 +1,8 @@
 import GhostContentAPI, { GhostAPI } from "@tryghost/content-api";
+import path from 'path';
+import fetch from 'node-fetch'; // Ensure you have the node-fetch package installed
+import { downloadImage } from './utils/downloadImages'; // Adjust the path as needed
+
 
 // Create API instance with site credentials
 export const api: GhostAPI = new GhostContentAPI({
@@ -7,14 +11,16 @@ export const api: GhostAPI = new GhostContentAPI({
   version: "v5.0"
 });
 
-// Client-side fetch for paginated posts
-export async function getPosts(page = 1) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-  const res = await fetch(`${baseUrl}/posts?page=${page}`);
-  
-  const posts = await res.json();
-
-  return posts;
+export async function getPosts(limit = 10, page = 1) {
+  return await api.posts
+    .browse({
+      include: ["tags", "authors"],
+      limit: limit,
+      page: page
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 }
 
 export async function getFeaturedPost() {
