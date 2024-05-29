@@ -9,7 +9,9 @@ export const api: GhostAPI = new GhostContentAPI({
 
 // Client-side fetch for paginated posts
 export async function getPosts(page = 1) {
-  const res = await fetch(`http://localhost:3002/api/posts?page=${page}`);
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const res = await fetch(`${baseUrl}/posts?page=${page}`);
+  
   const posts = await res.json();
 
   return posts;
