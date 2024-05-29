@@ -24,7 +24,7 @@ interface CmsData {
 }
 //
 
-export const getStaticProps: GetStaticProps = async (contex) => {
+export const getStaticProps: GetStaticProps = async () => {
   let settings;
   let posts = [];
   let popularPosts = [];
