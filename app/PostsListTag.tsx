@@ -7,12 +7,12 @@ import { ptBR } from 'date-fns/locale';
 import { getTagPosts } from './ghost-client';
 import Pagination from './Pagination';
 
-function PostsListTag({ initialPosts, totalPages, tagSlug }) {
+function PostsListTag({ initialPosts, totalPages, currentPage }) {
 
   return (
     <div className="container mx-auto my-12 max-w-7xl px-4">
-      {posts.length > 0 ? (
-        posts.map((post, index) => (
+      {initialPosts.length > 0 ? (
+        initialPosts.map((post, index) => (
           <div key={index} className="flex flex-col md:flex-row bg-gray-100 rounded-lg overflow-hidden mb-8 pb-4 border-b border-gray-300">
             <div className="relative w-full md:w-2/5 rounded-lg" style={{ width: '379px', height: '171px' }}>
               {post.feature_image && (
@@ -47,7 +47,7 @@ function PostsListTag({ initialPosts, totalPages, tagSlug }) {
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
-        onPageChange={handlePageChange}
+        onPageChange={(page) => window.location.href = `/tags/${tagSlug}?page=${page}`}
       />
     </div>
   );

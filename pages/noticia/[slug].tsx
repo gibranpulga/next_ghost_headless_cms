@@ -31,11 +31,8 @@ export const getStaticPaths: GetStaticPaths = async () => {
   if (fs.existsSync(postsFilePath)) {
     posts = JSON.parse(fs.readFileSync(postsFilePath, 'utf8'));
   } else {
-    console.log('Creating new data files from noticia/[slug].tsx...');
-    
     posts = await getPosts();
     const urlMap = await processPosts(posts);
-    console.log('urlMap', urlMap);
     replaceUrlsInPosts(posts, urlMap);
 
     fs.mkdirSync(path.dirname(postsFilePath), { recursive: true });
