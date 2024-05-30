@@ -88,12 +88,11 @@ export async function getAllAuthors() {
     });
 }
 
-export async function getTagPosts(tagSlug: string, page: number = 1) {
+export async function getTagPosts(tagSlug: string) {
   return await api.posts.browse({
     filter: `tag:${tagSlug}`,
     include: ['tags', 'authors'],
-    limit: 10,
-    page: page
+    limit: "all",
   }).catch((error: Error) => {
     console.log(error);
   });

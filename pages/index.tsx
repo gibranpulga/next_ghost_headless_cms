@@ -46,7 +46,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
     if (!fs.existsSync(postsFilePath) || !fs.existsSync(settingsFilePath) || !fs.existsSync(pagesFilePath) || 
     !fs.existsSync(popularPostsFilePath) || !fs.existsSync(featuredPostFilePath) || !fs.existsSync(sidePostsFilePath)) {
-      console.log('Creating new data files from index...');
 
       posts = await getPosts();
       settings = await getNavigation();
@@ -91,6 +90,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
     throw new Error('Index creation failed: ' + error);
   }
 
+  popularPosts = allPosts.filter((post) => post.primary_tag && post.primary_tag.slug === "mais-lidos");
   totalPages = Math.ceil(posts.length / 10);
   const filteredPosts = posts.filter(post => !post.tags.some(tag => tag.slug === 'mais-lidos'));
   sidePosts = sidePosts.sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime()).slice(0, 2);
