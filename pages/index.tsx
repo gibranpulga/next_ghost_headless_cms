@@ -56,7 +56,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
       let featuredPosts = await getFeaturedPost();
       featuredPost = featuredPosts.find(item => !item.meta);
 
-      // Process and download images
       const urlMap = await processPosts(posts);
       const urlMapPopularPosts = await processPosts(popularPosts);
       const urlMapSidePosts = await processPosts(sidePosts);
