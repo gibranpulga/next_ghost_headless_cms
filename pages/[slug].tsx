@@ -1,13 +1,13 @@
 import Link from "next/link";
-import { getSinglePage, getAllPages, getNavigation } from "../app/ghost-client";
+import { getSinglePage, getAllPages, getNavigation } from "../app/ghost/ghost-client";
 import Image from "next/image";
 import { FaAngleLeft } from "react-icons/fa";
 import { notFound } from 'next/navigation';
 import { GetStaticProps, GetStaticPaths } from "next";
 import type { PostOrPage, PostsOrPages, SettingsResponse } from "@tryghost/content-api";
 import { format } from "date-fns";
-import RootLayout from "../app/layout"; // Adjust the import path
-import "../app/cards.min.css";
+import RootLayout from "../app/components/Layout"; // Adjust the import path
+import "../app/components/css/cards.min.css";
 
 interface PageProps {
   page: PostOrPage;

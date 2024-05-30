@@ -1,9 +1,9 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
-import { getNavigation, getSingleTag, getAllPages, getAllTags, getTagPosts } from '../../app/ghost-client';
+import { getNavigation, getSingleTag, getAllPages, getAllTags, getTagPosts } from '../../app/ghost/ghost-client';
 import type { Tag, PostsOrPages, SettingsResponse } from '@tryghost/content-api';
-import RootLayout from '../../app/layout';
-import '../../app/cards.min.css';
-import PostsListTag from '@/app/PostsListTag';
+import RootLayout from '../../app/components/Layout';
+import "../../app/components/css/cards.min.css";
+import PostsListTag from '@/app/components/PostsListTag';
 import fs from 'fs';
 import path from 'path';
 import { processPosts, replaceUrlsInPosts } from '@/app/utils/downloadAndUpdateImages';

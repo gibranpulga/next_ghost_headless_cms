@@ -4,15 +4,14 @@ import Link from "next/link";
 import type { PostOrPage } from "@tryghost/content-api";
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { getTagPosts } from './ghost-client';
+import { getSingleAuthorPosts } from '../ghost/ghost-client'; // Assume you have this function
 import Pagination from './Pagination';
 
-function PostsListTag({ initialPosts, totalPages, currentPage }) {
-
+function PostsListAuthor({ initialPosts, totalPages, authorSlug }) {
   return (
     <div className="container mx-auto my-12 max-w-7xl px-4">
-      {initialPosts.length > 0 ? (
-        initialPosts.map((post, index) => (
+      {posts.length > 0 ? (
+        posts.map((post, index) => (
           <div key={index} className="flex flex-col md:flex-row bg-gray-100 rounded-lg overflow-hidden mb-8 pb-4 border-b border-gray-300">
             <div className="relative w-full md:w-2/5 rounded-lg" style={{ width: '379px', height: '171px' }}>
               {post.feature_image && (
@@ -42,15 +41,15 @@ function PostsListTag({ initialPosts, totalPages, currentPage }) {
           </div>
         ))
       ) : (
-        <p>No posts found for this tag.</p>
+        <p>No posts found for this author.</p>
       )}
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
-        onPageChange={(page) => window.location.href = `/tags/${tagSlug}?page=${page}`}
+        onPageChange={handlePageChange}
       />
     </div>
   );
 }
 
-export default PostsListTag;
+export default PostsListAuthor;

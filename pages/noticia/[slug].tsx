@@ -1,15 +1,15 @@
 import Link from "next/link";
-import { getPosts, getNavigation, getAllPages, getSinglePost } from "../../app/ghost-client";
+import { getPosts, getNavigation, getAllPages, getSinglePost } from "../../app/ghost/ghost-client";
 import { GetStaticProps, GetStaticPaths } from "next";
 import type { PostOrPage, PostsOrPages, SettingsResponse } from "@tryghost/content-api";
 import { format } from "date-fns";
-import RootLayout from "../../app/layout";
-import "../../app/cards.min.css";
+import RootLayout from "../../app/components/Layout";
+import "../../app/components/css/cards.min.css";
 import Head from 'next/head';
 import fs from 'fs';
 import path from 'path';
 import { FaAngleLeft } from "react-icons/fa";
-import { processPosts, processSinglePost, replaceUrlInSinglePost, replaceUrlsInPosts } from "@/app/utils/downloadAndUpdateImages";
+import { processPosts, processSinglePost, replaceUrlsInPosts } from "@/app/utils/downloadAndUpdateImages";
 import { notFound } from "next/navigation";
 
 interface NewsProps {

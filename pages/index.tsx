@@ -1,12 +1,12 @@
-import FeaturedSection from '../app/FeaturedSection';
-import PostsListIndex from '@/app/PostsListIndex';
+import FeaturedSection from '../app/components/FeaturedSection';
+import PostsListIndex from '@/app/components/PostsListIndex';
 import { GetStaticProps } from 'next';
 import type { PostsOrPages, SettingsResponse, PostOrPage } from '@tryghost/content-api';
-import { getPosts, getNavigation, getTagPosts, getAllPages, getFeaturedPost } from '../app/ghost-client';
-import RootLayout from '@/app/layout';
-import PopularPosts from '../app/PopularPosts'; // Import the new component
-import CustomFinancialWidget from '@/app/TradingViewWidget';
-import HoroscopeWidget from '@/app/HoroscopeWidget';
+import { getPosts, getNavigation, getTagPosts, getAllPages, getFeaturedPost } from '../app/ghost/ghost-client';
+import RootLayout from '@/app/components/Layout';
+import PopularPosts from '../app/components/PopularPosts'; // Import the new component
+import CustomFinancialWidget from '@/app/components/TradingViewWidget';
+import HoroscopeWidget from '@/app/components/HoroscopeWidget';
 import { useState, useEffect } from "react";
 import { processPosts, processSinglePost, replaceUrlsInPosts, replaceUrlsInSinglePost } from '../app/utils/downloadAndUpdateImages';
 import fs from 'fs';
