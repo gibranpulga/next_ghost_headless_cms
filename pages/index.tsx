@@ -40,49 +40,26 @@ export const getStaticProps: GetStaticProps = async (context) => {
     const postsFilePath = path.join(process.cwd(), 'data', 'posts.json');
     const settingsFilePath = path.join(process.cwd(), 'data', 'settings.json');
     const pagesFilePath = path.join(process.cwd(), 'data', 'pages.json');
-    const popularPostsFilePath = path.join(process.cwd(), 'data', 'popular-posts.json');
-    const featuredPostFilePath = path.join(process.cwd(), 'data', 'featured-post.json');
-    const sidePostsFilePath = path.join(process.cwd(), 'data', 'side-posts.json');
 
-    if (!fs.existsSync(postsFilePath) || !fs.existsSync(settingsFilePath) || !fs.existsSync(pagesFilePath) || 
-    !fs.existsSync(popularPostsFilePath) || !fs.existsSync(featuredPostFilePath) || !fs.existsSync(sidePostsFilePath)) {
+    if (!fs.existsSync(postsFilePath) || !fs.existsSync(settingsFilePath) || !fs.existsSync(pagesFilePath)) {
 
       posts = await getPosts();
       settings = await getNavigation();
-      popularPosts = await getTagPosts('mais-lidos');
       pages = await getAllPages();
-      sidePosts = await getTagPosts('side-post');
-      let featuredPosts = await getFeaturedPost();
-      featuredPost = featuredPosts.find(item => !item.meta);
 
       const urlMap = await processPosts(posts);
-      const urlMapPopularPosts = await processPosts(popularPosts);
-      const urlMapSidePosts = await processPosts(sidePosts);
-      const urlMapFeaturedPost = await processSinglePost(featuredPost);
       
       replaceUrlsInPosts(posts, urlMap);
-      replaceUrlsInPosts(popularPosts, urlMapPopularPosts);
-      replaceUrlsInPosts(sidePosts, urlMapSidePosts);
-      replaceUrlsInSinglePost(featuredPost, urlMapFeaturedPost);
       
       fs.mkdirSync(path.dirname(postsFilePath), { recursive: true });
-      fs.mkdirSync(path.dirname(popularPostsFilePath), { recursive: true });
-      fs.mkdirSync(path.dirname(sidePostsFilePath), { recursive: true });
-      fs.mkdirSync(path.dirname(featuredPostFilePath), { recursive: true });
       fs.mkdirSync(path.dirname(settingsFilePath), { recursive: true });
       fs.mkdirSync(path.dirname(pagesFilePath), { recursive: true });
 
       fs.writeFileSync(postsFilePath, JSON.stringify(posts, null, 2));
-      fs.writeFileSync(popularPostsFilePath, JSON.stringify(popularPosts, null, 2));
-      fs.writeFileSync(sidePostsFilePath, JSON.stringify(sidePosts, null, 2));
-      fs.writeFileSync(featuredPostFilePath, JSON.stringify(featuredPost, null, 2));
       fs.writeFileSync(settingsFilePath, JSON.stringify(settings, null, 2));
       fs.writeFileSync(pagesFilePath, JSON.stringify(pages, null, 2));
     } else {
       posts = JSON.parse(fs.readFileSync(postsFilePath, 'utf8'));
-      popularPosts = JSON.parse(fs.readFileSync(popularPostsFilePath, 'utf8'));
-      sidePosts = JSON.parse(fs.readFileSync(sidePostsFilePath, 'utf8'));
-      featuredPost = JSON.parse(fs.readFileSync(featuredPostFilePath, 'utf8'));
       settings = JSON.parse(fs.readFileSync(settingsFilePath, 'utf8'));
       pages = JSON.parse(fs.readFileSync(pagesFilePath, 'utf8'));
     }
@@ -90,8 +67,11 @@ export const getStaticProps: GetStaticProps = async (context) => {
     throw new Error('Index creation failed: ' + error);
   }
 
-  popularPosts = allPosts.filter((post) => post.primary_tag && post.primary_tag.slug === "mais-lidos");
+  popularPosts = posts.filter(post => post.tags.some(tag => tag.name === 'mais-lidos'));
+  sidePosts = posts.filter(post => post.tags.some(tag => tag.name === 'side-post'));
+  featuredPost = posts.find(post => post.featured);
   totalPages = Math.ceil(posts.length / 10);
+  
   const filteredPosts = posts.filter(post => !post.tags.some(tag => tag.slug === 'mais-lidos'));
   sidePosts = sidePosts.sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime()).slice(0, 2);
 

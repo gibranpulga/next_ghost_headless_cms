@@ -19,14 +19,13 @@ const PopularPosts = ({ posts }: PopularPostsProps) => {
                   <Image
                     src={post.feature_image}
                     alt={post.feature_image_alt || post.title}
-                    width={50}
-                    height={50}
+                    width={95}
+                    height={95}
                     className="mr-4 rounded-lg"
                   />
                 )}
                 <div>
-                  <h3 className="text-lg font-bold">{post.title}</h3>
-                  <p className="text-sm text-gray-500">{post.excerpt}</p>
+                  <h3 className="text-sm font-bold">{post.title}</h3>
                 </div>
               </a>
             </Link>
